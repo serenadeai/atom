@@ -1,0 +1,26 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Enable Serenade",
+        "command": "serenade-atom:initialize"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "Serenade",
+          "submenu": [
+            {
+              "label": "Enable Serenade",
+              "command": "serenade-atom:initialize"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
