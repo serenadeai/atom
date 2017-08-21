@@ -1,11 +1,12 @@
 {
   "name": "serenade-atom",
   "main": "./lib/serenade-atom",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A short description of your package",
   "keywords": [],
   "activationCommands": {
-    "atom-workspace": "serenade-atom:initialize"
+    "atom-workspace": "serenade-atom:initialize",
+    "atom-workspace": "serenade-atom:show-transcript-input"
   },
   "repository": "https://github.com/atom/serenade-atom",
   "license": "MIT",

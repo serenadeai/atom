@@ -1,5 +1,6 @@
 {
   "atom-workspace": {
-    "ctrl-alt-o": "serenade-atom:initialize"
+    "ctrl-alt-s": "serenade-atom:initialize",
+    "ctrl-alt-i": "serenade-atom:show-transcript-input"
   }
 }

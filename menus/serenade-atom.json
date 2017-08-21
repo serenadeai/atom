@@ -17,6 +17,10 @@
             {
               "label": "Enable Serenade",
               "command": "serenade-atom:initialize"
+            },
+            {
+              "label": "Show transcript input",
+              "command": "serenade-atom:show-transcript-input"
             }
           ]
         }
