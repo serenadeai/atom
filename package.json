@@ -5,8 +5,7 @@
   "description": "A short description of your package",
   "keywords": [],
   "activationCommands": {
-    "atom-workspace": "serenade-atom:initialize",
-    "atom-workspace": "serenade-atom:show-transcript-input"
+    "atom-workspace": ["serenade-atom:initialize", "serenade-atom:show-transcript-input"]
   },
   "repository": "https://github.com/atom/serenade-atom",
   "license": "MIT",
