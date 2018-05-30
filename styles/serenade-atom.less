@@ -1,6 +1,71 @@
 @import "ui-variables";
+@import "./mixins";
 
 .serenade-atom.alert-panel {
     color: @text-color-error;
     text-align: center;
+}
+
+.decide {
+    .zoomIn;
+    width: 400px;
+    background: @color_grey_dark;
+    top: @space_medium;
+    border-radius: 4px;
+    box-shadow: 0px 0px 2px 1px rgba(0,0,0,.2);
+    border: @border_light;
+}
+
+.choice {
+    font-size: @font_size_main;
+    color: #fff;
+    padding: @space_small;
+    border-bottom: @border_light;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    &:last-child {
+        border: none;
+    }
+
+    .label,
+    .choice_content {
+        display: inline-block;
+    }
+
+    .label {
+        font-weight: bold;
+        width: 30px;
+        height: 30px;
+        line-height: 17px;
+        text-align: center;
+        border-radius: 50%;
+        padding: @space_tiny;
+        border: 2px solid #fff;
+        margin-right: @space_small;
+        position: relative;
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-basis: 30px;
+
+        svg {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: 40px;
+            height: 40px;
+            transform: rotateY(-180deg) rotateZ(-90deg);
+        }
+
+        svg circle {
+            stroke-dasharray: 113px;
+            stroke-dashoffset: 0px;
+            stroke-linecap: round;
+            stroke-width: 4px;
+            stroke: @color_accent;
+            fill: none;
+            animation: countdown 10s linear infinite reverse;
+        }
+    }
 }
