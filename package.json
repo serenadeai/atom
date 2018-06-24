@@ -4,15 +4,11 @@
   "version": "0.0.1",
   "description": "A short description of your package",
   "keywords": [],
-  "activationCommands": {
-    "atom-workspace": ["serenade-atom:initialize", "serenade-atom:show-transcript-input"]
-  },
-  "repository": "https://github.com/atom/serenade-atom",
+  "repository": "https://github.com/serenadeai/atom",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
-    "ws": "^5.2.0"
   }
 }

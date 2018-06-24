@@ -1,12 +1,4 @@
 {
-  "context-menu": {
-    "atom-text-editor": [
-      {
-        "label": "Enable Serenade",
-        "command": "serenade-atom:initialize"
-      }
-    ]
-  },
   "menu": [
     {
       "label": "Packages",
@@ -14,10 +6,6 @@
         {
           "label": "Serenade",
           "submenu": [
-            {
-              "label": "Enable Serenade",
-              "command": "serenade-atom:initialize"
-            },
             {
               "label": "Show transcript input",
               "command": "serenade-atom:show-transcript-input"
