@@ -9,6 +9,22 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
+  },
+  "providedServices": {
+    "status-bar": {
+      "description": "A container for indicators at the bottom of the workspace",
+      "versions": {
+        "1.0.0": "provideStatusBar",
+        "0.58.0": "legacyProvideStatusBar"
+      }
+    }
+  },
   "dependencies": {
   }
 }
