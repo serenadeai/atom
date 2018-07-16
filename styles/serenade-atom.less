@@ -1,9 +1,21 @@
 @import "ui-variables";
 @import "./mixins";
 
-.serenade-atom.alert-panel {
-    color: @text-color-error;
-    text-align: center;
+.help-panel {
+    max-width: 300px;
+    overflow: auto;
+    padding: 0 10px;
+
+    .btn-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 24px;
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
 }
 
 .decide {
