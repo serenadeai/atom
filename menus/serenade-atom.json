@@ -7,10 +7,6 @@
           "label": "Serenade",
           "submenu": [
             {
-              "label": "Help",
-              "command": "serenade-atom:show-help"
-            },
-            {
               "label": "Type commands",
               "command": "serenade-atom:show-transcript-input"
             }

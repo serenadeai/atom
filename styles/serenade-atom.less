@@ -1,90 +1,129 @@
 @import "ui-variables";
-@import "./mixins";
 
-.help-panel {
-    max-width: 300px;
-    overflow: auto;
-    padding: 0 10px;
+@color_text_grey: #615F63;
+@color_accent: #F8C61C;
 
-    .btn-close {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 24px;
+@border_dark: 1px solid #374252;
+@border_light: 1px solid #2b253a;
 
-        &:hover {
-            text-decoration: none;
-        }
+@space-tiny: 5px;
+@space-small: 10px;
+@space-medium: 20px;
+@space-large: 30px;
+@space-huge: 40px;
+@space-massive: 80px;
+
+@font-size: 15px;
+@font-size-small: 14px;
+
+@keyframes zoom-in {
+    from {
+        opacity: 0;
+        transform: scale3d(0.9, 0.9, 0.9);
+    }
+
+    to {
+        opacity: 1;
     }
 }
 
-.decide {
-    .zoomIn;
-    width: 400px;
-    background: @color_grey_dark;
-    top: @space_medium;
+.zoom-in {
+    animation-name: zoom-in;
+    animation-duration: 200ms;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes zoom-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        transform: scale3d(0.9, 0.9, 0.9);
+    }
+}
+
+.zoom-out {
+    animation-name: zoom-out;
+    animation-duration: 200ms;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+}
+
+.alternatives {
+    @alternatives-text-color: @text-color-highlight;
+    @alternatives-border-color: @button-background-color-hover;
+
+    color: @alternatives-text-color;
+    min-width: 400px;
+    max-width: 800px;
+    background: @overlay-background-color;
+    border: @alternatives-border-color 1px;
     border-radius: 4px;
-    box-shadow: 0px 0px 2px 1px rgba(0,0,0,.2);
-    border: @border_light;
-}
+    box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.2);
 
-.choice {
-    font-size: @font_size_main;
-    color: #fff;
-    padding: @space_small;
-    border-bottom: @border_light;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
+    .alternatives-header {
+        font-family: system-ui;
+        font-size: @font-size-small;
+        font-weight: 200;
+        padding: @space-small;
+        border-bottom: solid 1px @alternatives-border-color;
 
-    &:last-child {
-        border: none;
-    }
-
-    .label,
-    .choice_content {
-        display: inline-block;
-    }
-
-    .label {
-        font-weight: bold;
-        width: 30px;
-        height: 30px;
-        line-height: 17px;
-        text-align: center;
-        border-radius: 50%;
-        padding: @space_tiny;
-        border: 2px solid #fff;
-        margin-right: @space_small;
-        position: relative;
-        flex-grow: 0;
-        flex-shrink: 0;
-        flex-basis: 30px;
-
-        svg {
+        .alternatives-close {
+            display: block;
+            font-size: 18px;
+            font-weight: bold;
             position: absolute;
-            top: -5px;
-            left: -5px;
-            width: 40px;
-            height: 40px;
-            transform: rotateY(-180deg) rotateZ(-90deg);
+            right: 10px;
+            top: 3px;
+
+            &:hover {
+                text-decoration: none;
+            }
+        }
+    }
+
+    .alternative-row {
+        font-size: @font-size;
+        padding: @space-small;
+        border-bottom: solid 1px @alternatives-border-color;
+
+        &:last-child {
+            border: none;
         }
 
-        svg circle {
-            stroke-dasharray: 113px;
-            stroke-dashoffset: 0px;
-            stroke-linecap: round;
-            stroke-width: 4px;
-            stroke: @color_accent;
-            fill: none;
-            animation: countdown 10s linear infinite reverse;
+        .alternative-number, .alternative-description {
+            display: inline-block;
+            font-family: system-ui;
+        }
+
+        .alternative-number {
+            @size: 28px;
+
+            border: solid 2px @alternatives-text-color;
+            border-radius: 50%;
+            font-weight: 600;
+            height: @size;
+            line-height: 13px;
+            margin-right: @space-tiny;
+            padding: @space-tiny;
+            position: relative;
+            text-align: center;
+            width: @size;
+        }
+
+        .alternative-code {
+            display: block;
+            margin-top: @space-small;
+
+            pre {
+                font-size: @font-size-small;
+            }
         }
     }
 
     &.invalid {
         color: @text-color-error;
-        svg circle {
-            stroke: @text-color-error;
-        }
     }
 }
