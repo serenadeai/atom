@@ -1,18 +1,15 @@
 {
-  "menu": [
-    {
-      "label": "Packages",
-      "submenu": [
-        {
-          "label": "Serenade",
-          "submenu": [
-            {
-              "label": "Type commands",
-              "command": "serenade-atom:show-transcript-input"
-            }
-          ]
-        }
-      ]
-    }
-  ]
+  "menu": [{
+    "label": "Packages",
+    "submenu": [{
+      "label": "Serenade",
+      "submenu": [{
+        "label": "Type commands",
+        "command": "serenade-atom:show-transcript-input"
+      }, {
+        "label": "Restart",
+        "command": "serenade-atom:restart"
+      }]
+    }]
+  }]
 }
