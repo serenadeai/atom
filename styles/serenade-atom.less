@@ -15,75 +15,34 @@
 
 @font-size: 15px;
 @font-size-small: 14px;
-
-@keyframes zoom-in {
-    from {
-        opacity: 0;
-        transform: scale3d(0.9, 0.9, 0.9);
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-.zoom-in {
-    animation-name: zoom-in;
-    animation-duration: 200ms;
-    animation-timing-function: ease-in-out;
-}
-
-@keyframes zoom-out {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-        transform: scale3d(0.9, 0.9, 0.9);
-    }
-}
-
-.zoom-out {
-    animation-name: zoom-out;
-    animation-duration: 200ms;
-    animation-timing-function: ease-in-out;
-    animation-fill-mode: forwards;
-}
+@font-size-tiny: 13px;
 
 .alternatives {
     @alternatives-text-color: @text-color-highlight;
     @alternatives-border-color: @button-background-color-hover;
 
-    background: @overlay-background-color;
-    border: @alternatives-border-color 1px;
-    border-radius: 4px;
-    box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.2);
     color: @alternatives-text-color;
-    max-height: 600px;
-    max-width: 800px;
-    min-width: 400px;
-    overflow: auto;
+    min-width: 300px;
 
-    .alternatives-header {
-        font-family: system-ui;
-        font-size: @font-size-small;
-        font-weight: 200;
-        padding: @space-small;
-        border-bottom: solid 1px @alternatives-border-color;
+    .alternatives-logo {
+        margin: 0 auto;
+        margin-top: 20px;
+        text-align: center;
 
-        .alternatives-close {
-            display: block;
-            font-size: 18px;
-            font-weight: bold;
-            position: absolute;
-            right: 10px;
-            top: 3px;
-
-            &:hover {
-                text-decoration: none;
-            }
+        img {
+            width: 120px;
         }
+    }
+
+    .alternatives-status {
+        font-family: system-ui;
+        font-size: @font-size-tiny;
+        margin-top: @space-small;
+        text-align: center;
+    }
+
+    .alternatives-list {
+        margin-top: @space-small;
     }
 
     .alternative-row {
@@ -91,8 +50,24 @@
         padding: @space-small;
         border-bottom: solid 1px @alternatives-border-color;
 
+        &:first-child {
+            border-top: solid 1px @alternatives-border-color;
+        }
+
         &:last-child {
             border: none;
+        }
+
+        &.invalid {
+            color: @text-color-error;
+
+            .alternative-number {
+                border-color: @text-color-error;
+            }
+        }
+
+        &.highlighted {
+            background: fadeout(@background-color-success, 60%);
         }
 
         .alternative-number, .alternative-description {
@@ -123,9 +98,5 @@
                 font-size: @font-size-small;
             }
         }
-    }
-
-    &.invalid {
-        color: @text-color-error;
     }
 }
