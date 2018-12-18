@@ -1,7 +1,7 @@
 @import "ui-variables";
 
-@color_text_grey: #615F63;
-@color_accent: #F8C61C;
+@color_text_grey: #615f63;
+@color_accent: #f8c61c;
 
 @border_dark: 1px solid #374252;
 @border_light: 1px solid #2b253a;
@@ -17,12 +17,17 @@
 @font-size-small: 14px;
 @font-size-tiny: 13px;
 
+.tool-panel {
+    overflow: auto;
+}
+
 .alternatives {
     @alternatives-text-color: @text-color-highlight;
     @alternatives-border-color: @button-background-color-hover;
 
     color: @alternatives-text-color;
     min-width: 300px;
+    max-width: 600px;
 
     .alternatives-logo {
         margin: 0 auto;
@@ -52,9 +57,10 @@
     }
 
     .alternative-row {
+        border-bottom: solid 1px @alternatives-border-color;
+        display: block;
         font-size: @font-size;
         padding: @space-small;
-        border-bottom: solid 1px @alternatives-border-color;
 
         &:first-child {
             border-top: solid 1px @alternatives-border-color;
@@ -62,6 +68,11 @@
 
         &:last-child {
             border: none;
+        }
+
+        &:hover {
+            background: fadeout(@background-color-success, 80%);
+            text-decoration: none;
         }
 
         &.invalid {
