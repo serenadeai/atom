@@ -1,11 +1,5 @@
 @import "ui-variables";
 
-@color_text_grey: #615f63;
-@color_accent: #f8c61c;
-
-@border_dark: 1px solid #374252;
-@border_light: 1px solid #2b253a;
-
 @space-tiny: 5px;
 @space-small: 10px;
 @space-medium: 20px;
@@ -44,6 +38,12 @@
         font-size: @font-size-tiny;
         margin-top: @space-small;
         text-align: center;
+    }
+
+    .alternatives-header {
+        font-size: @font-size-small;
+        margin-left: @space-small;
+        margin-top: @space-small;
     }
 
     .alternatives-controls {
@@ -85,6 +85,18 @@
 
         &.highlighted {
             background: fadeout(@background-color-success, 60%);
+        }
+
+        &.suggestion {
+            color: fadeout(@alternatives-text-color, 50%);
+        }
+
+        &.suggestion:hover {
+            background: inherit;
+        }
+
+        pre.inline {
+            display: inline;
         }
 
         .alternative-number, .alternative-description {
