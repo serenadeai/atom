@@ -2,29 +2,17 @@
   "name": "serenade-atom",
   "main": "./lib/serenade",
   "version": "0.0.1",
-  "description": "A short description of your package",
+  "description": "With Serenade, you can code with voice.",
   "keywords": [],
   "repository": "https://github.com/serenadeai/atom",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-  "consumedServices": {
-    "status-bar": {
-      "versions": {
-        "^1.0.0": "consumeStatusBar"
-      }
-    }
-  },
-  "providedServices": {
-    "status-bar": {
-      "description": "A container for indicators at the bottom of the workspace",
-      "versions": {
-        "1.0.0": "provideStatusBar",
-        "0.58.0": "legacyProvideStatusBar"
-      }
-    }
-  },
   "dependencies": {
+    "decompress": "4.2.0",
+    "mkdirp": "0.5.1",
+    "request": "2.88.0",
+    "request-progress": "3.0.0"
   }
 }
