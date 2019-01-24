@@ -21,7 +21,7 @@
 
     color: @alternatives-text-color;
     min-width: 300px;
-    max-width: 600px;
+    max-width: 500px;
 
     .alternatives-logo {
         margin: 0 auto;
@@ -110,13 +110,13 @@
             border: solid 2px @alternatives-text-color;
             border-radius: 50%;
             font-weight: 600;
-            height: @size;
             line-height: 13px;
             margin-right: @space-tiny;
+            min-height: @size;
+            min-width: @size;
             padding: @space-tiny;
             position: relative;
             text-align: center;
-            width: @size;
         }
 
         .alternative-code {
