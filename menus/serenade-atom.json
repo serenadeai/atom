@@ -4,11 +4,14 @@
     "submenu": [{
       "label": "Serenade",
       "submenu": [{
-        "label": "Type commands",
-        "command": "serenade-atom:show-transcript-input"
-      }, {
-        "label": "Restart",
+        "label": "Restart Serenade",
         "command": "serenade-atom:restart"
+      }, {
+        "label": "Toggle help",
+        "command": "serenade-atom:toggle-help-panel"
+      }, {
+        "label": "Input commands via keyboard",
+        "command": "serenade-atom:show-transcript-input"
       }]
     }]
   }]
