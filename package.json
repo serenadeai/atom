@@ -2,7 +2,7 @@
   "name": "serenade-atom",
   "main": "./lib/serenade",
   "version": "0.0.2",
-  "description": "Code with voice.",
+  "description": "Code with voice. https://serenade.ai",
   "keywords": [],
   "repository": "https://github.com/serenadeai/atom",
   "license": "MIT",

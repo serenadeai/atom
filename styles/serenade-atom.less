@@ -107,7 +107,6 @@ a:hover, a:focus {
                 background: @button-background-color;
                 border: 1px solid @button-border-color;
                 border-top: none;
-                height: 0;
                 left: -1px;
                 margin-top: 2px;
                 opacity: 0;
@@ -129,7 +128,6 @@ a:hover, a:focus {
                 }
 
                 &.active {
-                    height: auto;
                     opacity: 1;
                 }
 
@@ -163,14 +161,23 @@ a:hover, a:focus {
     }
 
     .alternatives-token-container {
-        display: flex;
         padding: @space-medium;
         padding-top: 0;
 
-        .input-token {
-            flex-grow: 2;
-            border: 1px solid @button-border-color;
-            background: @input-background-color;
+        a {
+            text-decoration: underline;
+        }
+
+        .alternatives-token-controls {
+            display: flex;
+            margin-top: @space-medium;
+            padding-top: 0;
+
+            .input-token {
+                flex-grow: 2;
+                border: 1px solid @button-border-color;
+                background: @input-background-color;
+            }
         }
     }
 
