@@ -250,8 +250,16 @@ a:hover, a:focus {
             min-height: @size;
             min-width: @size;
             padding: @space-tiny;
-            position: relative;
             text-align: center;
+            vertical-align: top;
+        }
+
+        .alternative-description {
+            vertical-align: middle;
+
+            &.has-newline {
+                vertical-align: text-top;
+            }
         }
 
         .alternative-code {
