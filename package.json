@@ -1,7 +1,7 @@
 {
   "name": "serenade",
   "main": "./lib/serenade",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Code with voice. Learn more at https://serenade.ai.",
   "repository": "https://github.com/serenadeai/atom",
   "license": "MIT",
