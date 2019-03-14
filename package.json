@@ -1,14 +1,17 @@
 {
-  "name": "serenade-atom",
+  "name": "serenade",
   "main": "./lib/serenade",
-  "version": "0.0.2",
-  "description": "Code with voice. https://serenade.ai",
-  "keywords": [],
+  "version": "0.0.0",
+  "description": "Code with voice. Learn more at https://serenade.ai.",
   "repository": "https://github.com/serenadeai/atom",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
+  "keywords": [
+    "voice",
+    "accessibility"
+  ],
   "dependencies": {
     "decompress": "^4.2.0",
     "mkdirp": "0.5.1",

@@ -5,13 +5,10 @@
       "label": "Serenade",
       "submenu": [{
         "label": "Restart Serenade",
-        "command": "serenade-atom:restart"
-      }, {
-        "label": "Toggle help",
-        "command": "serenade-atom:toggle-help-panel"
+        "command": "serenade:restart"
       }, {
         "label": "Input commands via keyboard",
-        "command": "serenade-atom:show-transcript-input"
+        "command": "serenade:show-transcript-input"
       }]
     }]
   }]
