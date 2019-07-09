@@ -11,12 +11,70 @@
 @font-size-small: 14px;
 @font-size-tiny: 13px;
 
+@alternatives-text-color: @text-color-highlight;
+@alternatives-border-color: @button-background-color-hover;
+
+@keyframes flicker {
+    0% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes lds-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.lds-ring {
+    display: inline-block;
+    position: relative;
+    width: 12px;
+    height: 12px;
+    vertical-align: middle;
+}
+
+.lds-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid @alternatives-text-color;
+    border-radius: 50%;
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: @alternatives-text-color transparent transparent transparent;
+}
+
+.lds-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+}
+
+.lds-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+}
+
+.lds-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+}
+
 .tool-panel {
     overflow: auto;
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 a:hover, a:focus {
@@ -30,12 +88,8 @@ a:hover, a:focus {
 }
 
 .alternatives {
-    @alternatives-text-color: @text-color-highlight;
-    @alternatives-border-color: @button-background-color-hover;
-
     color: @alternatives-text-color;
-    min-width: 300px;
-    max-width: 500px;
+    width: 350px;
 
     .btn-alternatives {
         background: @button-background-color;
@@ -55,19 +109,58 @@ a:hover, a:focus {
         width: 100%;
         display: flex;
         padding: @space-medium;
+        align-items: center;
+        justify-content: center;
 
         .alternatives-logo {
-            flex-grow: 2;
-
             img {
                 width: 120px;
             }
         }
 
+        .spacer {
+            flex-grow: 2;
+        }
+
+        .listening-indicator {
+            animation: flicker 3s ease-in-out infinite;
+            background: fadeout(@background-color-success, 50%);
+            border-radius: 8px;
+            height: 8px;
+            margin-left: @space-small;
+            margin-top: @space-tiny;
+            width: 8px;
+        }
+
         .alternatives-status {
+            align-self: flex-end;
             font-family: system-ui;
             font-size: @font-size-tiny;
-            margin-top: @space-small;
+        }
+    }
+
+    .alternatives-login-container {
+        padding: @space-small;
+
+        atom-text-editor {
+            margin-bottom: @space-tiny;
+        }
+
+        .alternatives-pre-login-buttons {
+            button {
+                width: 100%;
+                padding: @space-tiny;
+                margin-bottom: @space-tiny;
+            }
+        }
+
+        .btn-login .lds-ring, .btn-register .lds-ring {
+            margin-left: @space-tiny;
+        }
+
+        .login-error {
+            margin-bottom: @space-small;
+            margin-left: 1px;
         }
     }
 
@@ -160,34 +253,45 @@ a:hover, a:focus {
         }
     }
 
-    .alternatives-token-container {
-        padding: @space-medium;
-        padding-top: 0;
-
-        a {
-            text-decoration: underline;
-        }
-
-        .alternatives-token-controls {
-            display: flex;
-            margin-bottom: @space-medium;
-            padding-top: 0;
-
-            .input-token {
-                flex-grow: 2;
-                border: 1px solid @button-border-color;
-                background: @input-background-color;
-            }
-        }
-    }
-
     .alternatives-header {
         font-size: @font-size-small;
         margin-left: @space-small;
         margin-top: @space-large;
     }
 
-    .alternatives-list {
+    .nux {
+        background: @inset-panel-background-color;
+        border: 1px solid @inset-panel-border-color;
+        border-radius: 3px;
+        margin: @space-small;
+        padding: @space-small;
+        padding-top: 2px;
+
+        .nux-heading {
+            margin: @space-small 0 @space-tiny 0;
+        }
+
+        .nux-progress {
+            background: fadeout(@background-color-success, 60%);
+            height: 2px;
+            margin-bottom: 3px;
+            width: @space-tiny;
+        }
+    }
+
+    .alternatives-valid-header,
+    .alternatives-invalid-header {
+        font-size: @font-size-small;
+        margin-left: @space-small;
+        margin-top: @space-large;
+    }
+
+    .alternatives-valid-header .lds-ring {
+        margin-right: @space-tiny;
+    }
+
+    .alternatives-valid-list,
+    .alternatives-invalid-list {
         margin-top: @space-small;
     }
 
@@ -273,13 +377,32 @@ a:hover, a:focus {
     }
 }
 
-.help {
-    width: 500px;
+.docs-panel {
+    height: 100%;
+    width: 350px;
     overflow: auto;
 
     iframe {
         border: none;
         height: 100%;
         width: 100%;
+    }
+
+    .btn-close {
+        @size: 28px;
+
+        background: @button-background-color;
+        color: @text-color-highlight;
+        font-size: 20px;
+        line-height: 20px;
+        margin: 0;
+        padding: 0;
+        height: @size;
+        position: absolute;
+        right: @space-small;
+        text-align: center;
+        top: @space-small;
+        vertical-align: middle;
+        width: @size;
     }
 }
