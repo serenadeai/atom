@@ -1,23 +1,30 @@
-'use babel'
+import App from './app';
+import IPC from './shared/ipc';
 
 export default class TranscriptInputView {
-    constructor(delegate, ipc) {
-        this.delegate = delegate;
+    private app: App;
+    private ipc: IPC;
+    private container: HTMLElement;
+    private input: any;
+    private panel: any;
+
+    constructor(app: App, ipc: IPC) {
+        this.app = app;
         this.ipc = ipc;
 
         // create container
-        this.element = document.createElement('div');
-        this.element.classList.add('serenade');
-        this.element.classList.add('transcript-input-container');
+        this.container = document.createElement('div');
+        this.container.classList.add('serenade');
+        this.container.classList.add('transcript-input-container');
 
         // create element to hold input view
         this.input = document.createElement('atom-text-editor');
         this.input.setAttribute('mini', 'true');
-        this.input.addEventListener('blur', (e) => {
+        this.input.addEventListener('blur', () => {
             this.hide();
         });
 
-        this.input.addEventListener('keyup', (e) => {
+        this.input.addEventListener('keyup', (e: any) => {
             // hide on escape key
             if (e.which == 27) {
                 this.hide();
@@ -30,24 +37,19 @@ export default class TranscriptInputView {
             }
         });
 
-        this.element.appendChild(this.input);
+        this.container.appendChild(this.input);
 
         // create native atom panel at top of editor
-        this.panel = atom.workspace.addModalPanel({
-            item: this.element,
-            visible: false
-        });
+        this.panel = atom.workspace.addModalPanel({item: this.container, visible: false});
     }
 
     execute() {
-        this.ipc.sendText(this.input.getModel().getText());
+        this.ipc.send('SEND_TEXT', {text: this.input!.getModel().getText()});
     }
 
     hide() {
         this.panel.hide();
-        if (this.delegate) {
-            this.delegate.focusEditor();
-        }
+        this.app.focusEditor();
     }
 
     show() {

@@ -1,15 +1,24 @@
-'use babel';
+import App from './app';
+import CommandHandlerBase from './shared/command-handler';
+import Settings from './shared/settings';
+import StateManager from './shared/state-manager';
 
-export default class CommandHandler {
-    constructor(delegate, state, settings) {
-        this.delegate = delegate;
+declare var atom: any;
+
+export default class CommandHandler implements CommandHandlerBase {
+    private app: App;
+    private settings: Settings;
+    private state: StateManager;
+    private pendingFiles: any[] = [];
+    private ignorePatternsData: any = null;
+
+    constructor(app: App, state: StateManager, settings: Settings) {
+        this.app = app;
         this.state = state;
         this.settings = settings;
-        this._pendingFiles = [];
-        this._ignorePatternsData = null;
     }
 
-    _dispatch(command) {
+    private dispatch(command: string) {
         let view = atom.workspace.getActivePane();
         let editor = atom.workspace.getActiveTextEditor();
         if (editor) {
@@ -19,8 +28,8 @@ export default class CommandHandler {
         atom.commands.dispatch(view, command);
     }
 
-    _ignorePatterns() {
-        if (this._ignorePatternsData == null) {
+    private ignorePatterns() {
+        if (this.ignorePatternsData == null) {
             let directory = [];
             let file = [];
 
@@ -33,37 +42,34 @@ export default class CommandHandler {
                 }
             }
 
-            this._ignorePatternsData = {
-                directory: new RegExp(directory.join('|')),
-                file: new RegExp(file.join('|'))
-            }
+            this.ignorePatternsData = { directory: new RegExp(directory.join('|')), file: new RegExp(file.join('|')) }
         }
 
-        return this._ignorePatternsData;
+        return this.ignorePatternsData;
     }
 
-    _openPendingFileAtIndex(index) {
-        if (index < 0 || index >= this._pendingFiles.length) {
+    private openPendingFileAtIndex(index: number) {
+        if (index < 0 || index >= this.pendingFiles.length) {
             return;
         }
 
-        atom.workspace.open(this._pendingFiles[index].getPath());
+        atom.workspace.open(this.pendingFiles[index].getPath());
     }
 
-    _searchFiles(query, root) {
+    private searchFiles(query: string, root: any): any {
         // we want to look for any substring match, so replace spaces with wildcard
         let re = new RegExp(query.toLowerCase().replace(/ /g, '(.*)'));
 
         // skip over ignored directories
-        if (root.getPath().match(this._ignorePatterns().directory)) {
+        if (root.getPath().match(this.ignorePatterns().directory)) {
             return [];
         }
 
         let result = [];
-        let ignoreFile = this._ignorePatterns().file;
+        let ignoreFile = this.ignorePatterns().file;
         for (let e of root.getEntriesSync()) {
             if (e.isDirectory()) {
-                result.push(...this._searchFiles(query, e));
+                result.push(...this.searchFiles(query, e));
             }
             else if (e.isFile()) {
                 // check for a substring match, ignoring case, directory separators, and dots
@@ -77,7 +83,7 @@ export default class CommandHandler {
         return result;
     }
 
-    _setSourceAndCursor(source, cursor) {
+    private setSourceAndCursor(source: string, cursor: number) {
         let editor = atom.workspace.getActiveTextEditor();
         if (!editor) {
             return;
@@ -101,7 +107,7 @@ export default class CommandHandler {
         });
     }
 
-    async _uiDelay() {
+    private async uiDelay() {
         // wait enough time for UI updates to actually happen
         return new Promise(resolve => {
             setTimeout(() => {
@@ -110,42 +116,38 @@ export default class CommandHandler {
         });
     }
 
-    async COMMAND_TYPE_CANCEL(data) {
-        this.state.set('alternatives', { suggestions: true });
+    async COMMAND_TYPE_CANCEL(_data: any): Promise<any> {
+        this.state.set('alternatives', {suggestions: true});
     }
 
-    async COMMAND_TYPE_CLOSE_TAB(data) {
+    async COMMAND_TYPE_CLOSE_TAB(_data: any): Promise<any> {
         atom.workspace.getActivePane().destroyActiveItem();
-        await this._uiDelay();
+        await this.uiDelay();
     }
 
-    async COMMAND_TYPE_CLOSE_WINDOW(data) {
-        this._dispatch('pane:close');
-        await this._uiDelay();
+    async COMMAND_TYPE_CLOSE_WINDOW(_data: any): Promise<any> {
+        this.dispatch('pane:close');
+        await this.uiDelay();
     }
 
-    async COMMAND_TYPE_COPY(data) {
+    async COMMAND_TYPE_COPY(data: any): Promise<any> {
         if (data && data.text) {
             atom.clipboard.write(data.text);
         }
     }
 
-    async COMMAND_TYPE_CREATE_TAB(data) {
+    async COMMAND_TYPE_CREATE_TAB(_data: any): Promise<any> {
         atom.workspace.open();
-        await this._uiDelay();
+        await this.uiDelay();
     }
 
-    async COMMAND_TYPE_DIFF(data) {
-        this._setSourceAndCursor(data.source, data.cursor);
-        this.delegate.focusEditor();
+    async COMMAND_TYPE_DIFF(data: any): Promise<any> {
+        this.setSourceAndCursor(data.source, data.cursor);
+        this.app.focusEditor();
     }
 
-    async COMMAND_TYPE_GET_EDITOR_STATE(data) {
-        let result = {
-            'source': '',
-            'cursor': 0,
-            'filename': ''
-        };
+    async COMMAND_TYPE_GET_EDITOR_STATE(_data: any): Promise<any> {
+        let result = {'source': '', 'cursor': 0, 'filename': ''};
 
         let editor = atom.workspace.getActiveTextEditor();
         if (!editor) {
@@ -170,7 +172,7 @@ export default class CommandHandler {
                 currentColumn++;
             }
 
-            if (text[i] == "\n") {
+            if (text[i] == '\n') {
                 currentRow++;
             }
 
@@ -183,10 +185,13 @@ export default class CommandHandler {
         return result;
     }
 
-    async COMMAND_TYPE_INVALID(data) {
+    async COMMAND_TYPE_GO_TO_DEFINITION(_data: any): Promise<any> {
     }
 
-    async COMMAND_TYPE_LOGIN(data) {
+    async COMMAND_TYPE_INVALID(_data: any): Promise<any> {
+    }
+
+    async COMMAND_TYPE_LOGIN(data: any): Promise<any> {
         if (data.text !== '' && data.text !== undefined) {
             this.state.set('appState', 'READY');
         }
@@ -195,25 +200,25 @@ export default class CommandHandler {
         }
     }
 
-    async COMMAND_TYPE_NEXT_TAB(data) {
+    async COMMAND_TYPE_NEXT_TAB(_data: any): Promise<any> {
         atom.workspace.getActivePane().activateNextItem();
-        await this._uiDelay();
+        await this.uiDelay();
     }
 
-    async COMMAND_TYPE_OPEN_FILE(data) {
+    async COMMAND_TYPE_OPEN_FILE(data: any): Promise<any> {
         // sort the project root paths by length, longest first
         let roots = atom.project.getPaths();
-        roots.sort((a, b) => {
+        roots.sort((a: any[], b: any[]) => {
             return b.length - a.length;
         });
 
         let result = [];
         for (let e of atom.project.getDirectories()) {
-            result.push(...this._searchFiles(data.path, e));
+            result.push(...this.searchFiles(data.path, e));
         }
 
-        this._pendingFiles = result;
-        let alternatives = result.map((e, i) => {
+        this.pendingFiles = result;
+        let alternatives = result.map(e => {
             // remove the longest root that's a prefix of the given path
             let path = e.getPath();
             for (let root of roots) {
@@ -223,18 +228,13 @@ export default class CommandHandler {
                 }
             }
 
-            return {
-                description: `open <code>${path}</code>`
-            };
+            return {description: `open <code>${path}</code>`};
         });
 
-        this.state.set('alternatives', {
-            alternatives: alternatives,
-            type: 'files'
-        });
+        this.state.set('alternatives', {alternatives: alternatives, type: 'files'});
     }
 
-    async COMMAND_TYPE_PASTE(data) {
+    async COMMAND_TYPE_PASTE(data: any): Promise<any> {
         let editor = atom.workspace.getActiveTextEditor();
         if (!editor) {
             return;
@@ -258,7 +258,7 @@ export default class CommandHandler {
             // for below (the default), move the cursor to the start of the next line
             if (data.direction == 'below') {
                 for (; insertionPoint < source.length; insertionPoint++) {
-                    if (source[insertionPoint] == "\n") {
+                    if (source[insertionPoint] == '\n') {
                         insertionPoint++;
                         break;
                     }
@@ -268,12 +268,12 @@ export default class CommandHandler {
             // for paste above, go to the start of the current line
             else if (data.direction == 'above') {
                 // if we're at the end of a line, then move the cursor back one, or else we'll paste below
-                if (source[insertionPoint] == "\n" && insertionPoint > 0) {
+                if (source[insertionPoint] == '\n' && insertionPoint > 0) {
                     insertionPoint--;
                 }
 
                 for (; insertionPoint >= 0; insertionPoint--) {
-                    if (source[insertionPoint] == "\n") {
+                    if (source[insertionPoint] == '\n') {
                         insertionPoint++;
                         break;
                     }
@@ -289,23 +289,22 @@ export default class CommandHandler {
             updatedCursor--;
         }
 
-        this._setSourceAndCursor(
-            source.substring(0, insertionPoint) + text + source.substring(insertionPoint),
-            updatedCursor
+        this.setSourceAndCursor(
+            source.substring(0, insertionPoint) + text + source.substring(insertionPoint), updatedCursor
         );
     }
 
-    async COMMAND_TYPE_PAUSE(data) {
+    async COMMAND_TYPE_PAUSE(_data: any): Promise<any> {
         this.state.set('listening', false);
         this.state.set('status', 'Paused');
     }
 
-    async COMMAND_TYPE_PREVIOUS_TAB(data) {
+    async COMMAND_TYPE_PREVIOUS_TAB(_data: any): Promise<any> {
         atom.workspace.getActivePane().activatePreviousItem();
-        await this._uiDelay();
+        await this.uiDelay();
     }
 
-    async COMMAND_TYPE_REDO(data) {
+    async COMMAND_TYPE_REDO(_data: any): Promise<any> {
         let editor = atom.workspace.getActiveTextEditor();
         if (!editor) {
             return;
@@ -314,7 +313,7 @@ export default class CommandHandler {
         editor.redo();
     }
 
-    async COMMAND_TYPE_SAVE(data) {
+    async COMMAND_TYPE_SAVE(_data: any): Promise<any> {
         let editor = atom.workspace.getActiveTextEditor();
         if (!editor) {
             return;
@@ -331,7 +330,7 @@ export default class CommandHandler {
         }
     }
 
-    async COMMAND_TYPE_SET_EDITOR_STATUS(data) {
+    async COMMAND_TYPE_SET_EDITOR_STATUS(data: any): Promise<any> {
         let text = data.text;
         if (data.volume) {
             this.state.set('volume', Math.floor(data.volume * 100));
@@ -340,17 +339,23 @@ export default class CommandHandler {
         this.state.set('status', text);
     }
 
-    async COMMAND_TYPE_SPLIT(data) {
-        this._dispatch('pane:split-' + data.direction + '-and-copy-active-item');
-        await this._uiDelay();
+    async COMMAND_TYPE_SNIPPET(_data: any): Promise<any> {
     }
 
-    async COMMAND_TYPE_SWITCH_TAB(data) {
+    async COMMAND_TYPE_SNIPPET_EXECUTED(_data: any): Promise<any> {
+    }
+
+    async COMMAND_TYPE_SPLIT(data: any): Promise<any> {
+        this.dispatch('pane:split-' + data.direction + '-and-copy-active-item');
+        await this.uiDelay();
+    }
+
+    async COMMAND_TYPE_SWITCH_TAB(data: any): Promise<any> {
         atom.workspace.getActivePane().activateItemAtIndex(data.index - 1);
-        await this._uiDelay();
+        await this.uiDelay();
     }
 
-    async COMMAND_TYPE_UNDO(data) {
+    async COMMAND_TYPE_UNDO(_data: any): Promise<any> {
         let editor = atom.workspace.getActiveTextEditor();
         if (!editor) {
             return;
@@ -359,24 +364,19 @@ export default class CommandHandler {
         editor.undo();
     }
 
-    async COMMAND_TYPE_USE(data) {
+    async COMMAND_TYPE_USE(data: any): Promise<any> {
         let index = data.index ? data.index - 1 : 0;
         this.state.set('highlighted', index);
         let alternatives = this.state.get('alternatives');
         if ('type' in alternatives && alternatives.type == 'files') {
-            this._openPendingFileAtIndex(index);
+            this.openPendingFileAtIndex(index);
         }
     }
 
-    async COMMAND_TYPE_WINDOW(data) {
-        let commands = {
-            'left': 'on-left',
-            'right': 'on-right',
-            'up': 'above',
-            'down': 'below'
-        };
+    async COMMAND_TYPE_WINDOW(data: any): Promise<any> {
+        let commands: any = {'left': 'on-left', 'right': 'on-right', 'up': 'above', 'down': 'below'};
 
-        this._dispatch('window:focus-pane-' + commands[data.direction]);
-        await this._uiDelay();
+        this.dispatch('window:focus-pane-' + commands[data.direction]);
+        await this.uiDelay();
     }
 }
