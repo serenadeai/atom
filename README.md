@@ -32,6 +32,4 @@ Use the same commands across multiple languages: Python, JavaScript, Java, and m
 
 ## Getting Started
 
-To enable Serenade, open the Command Palette and run the command `Enable Serenade`.
-
 Check out the [Serenade guide](https://docs.serenade.ai/) to start learning how to use Serenade.
