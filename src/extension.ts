@@ -6,6 +6,6 @@ export function activate(_state: any) {
     app.activate();
 }
 
-export function deactive() {
+export function deactivate() {
     app.deactivate();
 }

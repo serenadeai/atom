@@ -28,8 +28,8 @@ export default class App extends BaseApp {
     }
 
     deactivate() {
-        this.subscriptions!.dispose();
         this.destroy();
+        this.subscriptions!.dispose();
     }
 
     initialize() {
