@@ -9,7 +9,7 @@
         "fontawesome.min.css",
         "solid.min.css",
         "exports.less",
-        "shared/alternatives-panel.css",
+        "alternatives-panel.css",
         "serenade.less"
     ],
     "version": "1.0.1",
@@ -37,6 +37,7 @@
         "@types/node": "^10.14.12",
         "@types/rimraf": "^2.0.2",
         "@types/targz": "^1.0.0",
+        "copy-webpack-plugin": "^5.0.3",
         "ts-loader": "^6.0.4",
         "tslint": "^5.12.1",
         "typescript": "^3.5.2",

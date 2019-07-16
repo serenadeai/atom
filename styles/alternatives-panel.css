@@ -1,0 +1,328 @@
+@keyframes flicker {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+@keyframes lds-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.hidden {
+  display: none !important;
+}
+
+.alternatives-panel {
+  color: var(--text-color);
+}
+.alternatives-panel .success-color {
+  background-color: var(--success-color);
+  height: 1px;
+  width: 1px;
+}
+.alternatives-panel h1,
+.alternatives-panel h2,
+.alternatives-panel h3,
+.alternatives-panel h4,
+.alternatives-panel h5,
+.alternatives-panel h6,
+.alternatives-panel p {
+  margin: 0;
+  padding: 0;
+}
+.alternatives-panel a,
+.alternatives-panel button,
+.alternatives-panel .btn {
+  cursor: pointer;
+}
+.alternatives-panel a:hover,
+.alternatives-panel a:focus {
+  text-decoration: none;
+}
+.alternatives-panel .lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 12px;
+  height: 12px;
+  vertical-align: middle;
+}
+.alternatives-panel .lds-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--text-color);
+  border-radius: 50%;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: var(--text-color) transparent transparent transparent;
+}
+.alternatives-panel .lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.alternatives-panel .lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.alternatives-panel .lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+.alternatives-panel .alternatives-logo-container {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+}
+.alternatives-panel .alternatives-logo-container .alternatives-logo img {
+  width: 120px;
+}
+.alternatives-panel .alternatives-logo-container .spacer {
+  flex-grow: 2;
+}
+.alternatives-panel .alternatives-logo-container .listening-indicator {
+  animation: flicker 3s ease-in-out infinite;
+  background: var(--button-background-color);
+  border-radius: 8px;
+  height: 8px;
+  margin-left: 10px;
+  margin-top: 5px;
+  width: 8px;
+}
+.alternatives-panel .alternatives-logo-container .alternatives-status {
+  align-self: flex-end;
+  font-family: system-ui;
+  font-size: 13px;
+}
+.alternatives-panel .alternatives-login-container {
+  margin: 0 20px;
+}
+.alternatives-panel .alternatives-login-container atom-text-editor {
+  margin-bottom: 5px;
+}
+.alternatives-panel .alternatives-login-container .alternatives-pre-login-buttons input[type=text],
+.alternatives-panel .alternatives-login-container .alternatives-pre-login-buttons input[type=email],
+.alternatives-panel .alternatives-login-container .alternatives-pre-login-buttons input[type=password],
+.alternatives-panel .alternatives-login-container .alternatives-login input[type=text],
+.alternatives-panel .alternatives-login-container .alternatives-login input[type=email],
+.alternatives-panel .alternatives-login-container .alternatives-login input[type=password],
+.alternatives-panel .alternatives-login-container .alternatives-register input[type=text],
+.alternatives-panel .alternatives-login-container .alternatives-register input[type=email],
+.alternatives-panel .alternatives-login-container .alternatives-register input[type=password] {
+  display: block;
+  margin-bottom: 5px;
+  width: calc(100% - 22px);
+}
+.alternatives-panel .alternatives-login-container .alternatives-pre-login-buttons .btn-login-alt,
+.alternatives-panel .alternatives-login-container .alternatives-login .btn-login-alt,
+.alternatives-panel .alternatives-login-container .alternatives-register .btn-login-alt {
+  display: inline-block;
+  text-decoration: underline;
+  vertical-align: middle;
+}
+.alternatives-panel .alternatives-login-container .alternatives-pre-login-buttons button {
+  display: block;
+  margin-bottom: 1px;
+  height: 36px;
+  width: 100%;
+}
+.alternatives-panel .alternatives-login-container .btn-login .lds-ring, .alternatives-panel .alternatives-login-container .btn-register .lds-ring {
+  color: var(--button-foreground-color);
+  margin-left: 5px;
+}
+.alternatives-panel .alternatives-login-container .login-error {
+  margin-bottom: 10px;
+}
+.alternatives-panel .alternatives-volume-container {
+  align-items: center;
+  display: flex;
+  margin: 0 10px;
+}
+.alternatives-panel .alternatives-volume-container .alternatives-listen-controls {
+  display: flex;
+  justify-content: space-around;
+}
+.alternatives-panel .alternatives-volume-container .btn-listen {
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  display: block;
+}
+.alternatives-panel .alternatives-volume-container .btn-listen:focus {
+  border-right: 0;
+}
+.alternatives-panel .alternatives-volume-container .btn-menu {
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  display: block;
+  font-size: 10px;
+  outline: 0;
+  padding: 2px 8px;
+  position: relative;
+}
+.alternatives-panel .alternatives-volume-container .btn-menu i {
+  transition: transform 0.2s;
+}
+.alternatives-panel .alternatives-volume-container .btn-menu i.active {
+  transform: rotate(180deg) scaleX(-1);
+}
+.alternatives-panel .alternatives-volume-container .btn-menu:hover .menu-dropdown a {
+  color: var(--button-foreground-color);
+}
+.alternatives-panel .alternatives-volume-container .btn-menu .menu-dropdown {
+  background: var(--button-background-color);
+  border: 1px solid var(--button-border-color);
+  border-top: none;
+  left: 0;
+  margin-top: 5px;
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 2;
+}
+.alternatives-panel .alternatives-volume-container .btn-menu .menu-dropdown.active {
+  opacity: 1;
+}
+.alternatives-panel .alternatives-volume-container .btn-menu .menu-dropdown a {
+  border-bottom: 1px solid var(--border-color);
+  color: var(--button-foreground);
+  font-size: 13px;
+  display: block;
+  padding: 10px;
+  text-align: left;
+  text-decoration: none;
+}
+.alternatives-panel .alternatives-volume-container .btn-menu .menu-dropdown a:hover {
+  background: var(--button-background-color-hover);
+}
+.alternatives-panel .alternatives-volume-container .alternatives-bar-container {
+  flex-grow: 2;
+  border: 1px solid var(--border-color);
+  border-top: none;
+  margin-left: 10px;
+  height: 6px;
+}
+.alternatives-panel .alternatives-volume-container .alternatives-bar-container .alternatives-bar {
+  height: 100%;
+  transition: width 0.2s;
+}
+.alternatives-panel .nux {
+  background: var(--panel-background-color);
+  border: 1px solid var(--panel-border-color);
+  border-radius: 5px;
+  padding: 5px 10px 10px 10px;
+  margin: 10px;
+}
+.alternatives-panel .nux p {
+  margin-bottom: 1em;
+}
+.alternatives-panel .nux .nux-progress {
+  height: 2px;
+  width: 5px;
+  margin-bottom: 3px;
+}
+.alternatives-panel .nux .nux-heading {
+  margin-top: 10px;
+}
+.alternatives-panel .nux .nux-body {
+  font-size: 14px;
+  margin-top: 5px;
+}
+.alternatives-panel .nux .btn-nux-next {
+  font-size: 13px !important;
+  margin-top: 10px;
+}
+.alternatives-panel .alternatives-list-container .alternatives-valid-header,
+.alternatives-panel .alternatives-list-container .alternatives-invalid-header {
+  font-size: 14px;
+  margin-left: 10px;
+  margin-top: 20px;
+}
+.alternatives-panel .alternatives-list-container .alternatives-valid-header .lds-ring {
+  margin-right: 5px;
+}
+.alternatives-panel .alternatives-list-container .alternatives-valid-list,
+.alternatives-panel .alternatives-list-container .alternatives-invalid-list {
+  margin-top: 10px;
+}
+.alternatives-panel .alternatives-list-container .alternative-row {
+  border-bottom: solid 1px var(--border-color);
+  color: var(--text-color);
+  display: block;
+  font-size: 15px;
+  padding: 10px;
+}
+.alternatives-panel .alternatives-list-container .alternative-row:last-child {
+  border: none;
+}
+.alternatives-panel .alternatives-list-container .alternative-row:first-child {
+  border-top: solid 1px var(--border-color);
+}
+.alternatives-panel .alternatives-list-container .alternative-row:hover {
+  text-decoration: none;
+}
+.alternatives-panel .alternatives-list-container .alternative-row.invalid {
+  color: var(--error-color);
+}
+.alternatives-panel .alternatives-list-container .alternative-row.invalid .alternative-number {
+  border-color: var(--error-color) !important;
+  color: var(--error-color) !important;
+}
+.alternatives-panel .alternatives-list-container .alternative-row.suggestion {
+  color: var(--text-color-disabled) !important;
+}
+.alternatives-panel .alternatives-list-container .alternative-row.suggestion:hover {
+  background: inherit;
+}
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner .alternative-number {
+  border: solid 2px var(--text-color);
+  border-radius: 50%;
+  color: var(--text-color);
+  font-weight: 600;
+  margin-right: 10px;
+  min-height: 16px;
+  min-width: 16px;
+  padding: 4px;
+  text-align: center;
+}
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner .alternative-number .alternative-number-inner {
+  line-height: 15px;
+}
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner .alternative-description {
+  margin-top: -1px;
+  flex-grow: 2;
+  overflow: auto;
+}
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner .alternative-description pre.inline {
+  display: inline;
+  margin: 0;
+  margin-left: 5px;
+}
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner .alternative-description .alternative-code {
+  display: block;
+  margin-top: 10px;
+}
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner .alternative-description .alternative-code pre {
+  margin: 0;
+}
+.alternatives-panel .alternatives-list-container .alternative-row.has-newline .alternative-number {
+  align-self: flex-start;
+}
+.alternatives-panel .alternatives-list-container .alternative-row.has-newline .alternative-description {
+  margin-top: 2px;
+}
+
+/*# sourceMappingURL=alternatives-panel.css.map */

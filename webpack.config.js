@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = [
     {
@@ -23,6 +24,12 @@ module.exports = [
             extensions: ['.tsx', '.ts', '.js'],
             symlinks: false
         },
+        plugins: [
+            new CopyPlugin([{
+                from: path.resolve(__dirname, 'src/shared/build/alternatives-panel.css'),
+                to: path.resolve(__dirname, 'styles'),
+            }]),
+        ],
         module: {
             rules: [
                 {
