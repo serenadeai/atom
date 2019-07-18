@@ -21,7 +21,7 @@
         "accessibility"
     ],
     "scripts": {
-        "compile": "webpack --mode production",
+        "compile": "sass ../serenade-editor-shared/alternatives-panel.scss ../serenade-editor-shared/build/alternatives-panel.css && webpack --mode production",
         "dev": "webpack --mode development --watch"
     },
     "dependencies": {

@@ -28,6 +28,10 @@ export default class CommandHandler implements CommandHandlerBase {
         atom.commands.dispatch(view, command);
     }
 
+    private focus() {
+        this.app.focusEditor();
+    }
+
     private ignorePatterns() {
         if (this.ignorePatternsData == null) {
             let directory = [];
@@ -143,7 +147,7 @@ export default class CommandHandler implements CommandHandlerBase {
 
     async COMMAND_TYPE_DIFF(data: any): Promise<any> {
         this.setSourceAndCursor(data.source, data.cursor);
-        this.app.focusEditor();
+        this.focus();
     }
 
     async COMMAND_TYPE_GET_EDITOR_STATE(_data: any): Promise<any> {
@@ -339,10 +343,14 @@ export default class CommandHandler implements CommandHandlerBase {
         this.state.set('status', text);
     }
 
-    async COMMAND_TYPE_SNIPPET(_data: any): Promise<any> {
+    async COMMAND_TYPE_SNIPPET(data: any): Promise<any> {
+        this.state.set('loading', true);
+        this.app.ipc!.send('SEND_TEXT', {text: 'add executed snippet ' + data.text});
     }
 
-    async COMMAND_TYPE_SNIPPET_EXECUTED(_data: any): Promise<any> {
+    async COMMAND_TYPE_SNIPPET_EXECUTED(data: any): Promise<any> {
+        this.setSourceAndCursor(data.source, data.cursor);
+        this.focus();
     }
 
     async COMMAND_TYPE_SPLIT(data: any): Promise<any> {

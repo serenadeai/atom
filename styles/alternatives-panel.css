@@ -236,7 +236,10 @@
   font-size: 14px;
   margin-top: 5px;
 }
-.alternatives-panel .nux .btn-nux-next {
+.alternatives-panel .nux .nux-body a {
+  text-decoration: underline;
+}
+.alternatives-panel .nux .btn-nux-back, .alternatives-panel .nux .btn-nux-next {
   font-size: 13px !important;
   margin-top: 10px;
 }
@@ -282,47 +285,49 @@
 .alternatives-panel .alternatives-list-container .alternative-row.suggestion:hover {
   background: inherit;
 }
-.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner .alternative-number {
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-number {
   border: solid 2px var(--text-color);
   border-radius: 50%;
   color: var(--text-color);
+  display: inline-block;
+  font-size: 15px;
   font-weight: 600;
+  line-height: 15px;
   margin-right: 10px;
-  min-height: 16px;
-  min-width: 16px;
   padding: 4px;
   text-align: center;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
 }
-.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner .alternative-number .alternative-number-inner {
-  line-height: 15px;
+.alternatives-panel .alternatives-list-container .alternative-row.has-newline .alternative-number {
+  margin-top: -4px;
+  vertical-align: top;
 }
-.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner .alternative-description {
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-description {
+  display: inline-block;
+  font-size: 15px;
   margin-top: -1px;
-  flex-grow: 2;
-  overflow: auto;
+  min-height: 16px;
+  vertical-align: middle;
+  width: calc(100% - 44px);
 }
-.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner .alternative-description pre.inline {
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-description pre {
+  background: none;
+  white-space: pre-wrap;
+  font-size: 15px;
+  word-break: keep-all;
+}
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-description pre.inline {
   display: inline;
   margin: 0;
-  margin-left: 5px;
 }
-.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner .alternative-description .alternative-code {
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-description .alternative-code {
   display: block;
   margin-top: 10px;
 }
-.alternatives-panel .alternatives-list-container .alternative-row .alternative-row-inner .alternative-description .alternative-code pre {
+.alternatives-panel .alternatives-list-container .alternative-row .alternative-description .alternative-code pre {
   margin: 0;
-}
-.alternatives-panel .alternatives-list-container .alternative-row.has-newline .alternative-number {
-  align-self: flex-start;
-}
-.alternatives-panel .alternatives-list-container .alternative-row.has-newline .alternative-description {
-  margin-top: 2px;
 }
 
 /*# sourceMappingURL=alternatives-panel.css.map */
