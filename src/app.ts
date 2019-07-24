@@ -39,12 +39,12 @@ export default class App extends BaseApp {
 
         this.state = new StateManager();
         this.settings = new Settings();
+        this.clientRunner = new ClientRunnerFactory(this.state, this.settings).get();
         const docsPanel = new DocsPanel(this.state);
         const commandHandler = new CommandHandler(this, this.state, this.settings);
-        this.ipc = new AtomIPC(this, this.state, commandHandler);
+        this.ipc = new AtomIPC(this, this.state, commandHandler, this.clientRunner);
         const alternatives = new Alternatives(this.state, this.ipc!, this.settings, new AlternativesPanel());
         this.transcriptInputView = new TranscriptInputView(this, this.ipc!);
-        this.clientRunner = new ClientRunnerFactory(this.state, this.settings).get();
 
         alternatives.initialize();
         this.run();

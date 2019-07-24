@@ -303,6 +303,10 @@ export default class CommandHandler implements CommandHandlerBase {
         this.state.set('status', 'Paused');
     }
 
+    async COMMAND_TYPE_PING(_data: any): Promise<any> {
+        this.app.ipc!.send('PING', {});
+    }
+
     async COMMAND_TYPE_PREVIOUS_TAB(_data: any): Promise<any> {
         atom.workspace.getActivePane().activatePreviousItem();
         await this.uiDelay();
