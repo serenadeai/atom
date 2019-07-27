@@ -1,12 +1,12 @@
 @keyframes flicker {
   0% {
-    opacity: 0.5;
+    opacity: 1;
   }
   50% {
     opacity: 0;
   }
   100% {
-    opacity: 0.5;
+    opacity: 1;
   }
 }
 @keyframes lds-ring {
@@ -89,12 +89,12 @@
 }
 .alternatives-panel .alternatives-logo-container .listening-indicator {
   animation: flicker 3s ease-in-out infinite;
-  background: var(--button-background-color);
-  border-radius: 8px;
-  height: 8px;
+  background: var(--error-color);
+  border-radius: 10px;
+  height: 10px;
   margin-left: 10px;
   margin-top: 5px;
-  width: 8px;
+  width: 10px;
 }
 .alternatives-panel .alternatives-logo-container .alternatives-status {
   align-self: flex-end;
@@ -222,7 +222,15 @@
   margin: 10px;
 }
 .alternatives-panel .nux p {
-  margin-bottom: 1em;
+  margin-bottom: 10px;
+}
+.alternatives-panel .nux code {
+  display: block;
+  padding: 0;
+  margin: 0;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  font-size: 15px;
 }
 .alternatives-panel .nux .nux-progress {
   height: 2px;
@@ -281,6 +289,9 @@
 }
 .alternatives-panel .alternatives-list-container .alternative-row.suggestion {
   color: var(--text-color-disabled) !important;
+}
+.alternatives-panel .alternatives-list-container .alternative-row.invalid:hover, .alternatives-panel .alternatives-list-container .alternative-row.suggestion:hover {
+  cursor: default;
 }
 .alternatives-panel .alternatives-list-container .alternative-row.suggestion:hover {
   background: inherit;
