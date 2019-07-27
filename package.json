@@ -12,7 +12,7 @@
         "alternatives-panel.css",
         "serenade.less"
     ],
-    "version": "1.0.2",
+    "version": "1.0.3",
     "engines": {
         "atom": ">=1.0.0 <2.0.0"
     },
