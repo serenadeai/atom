@@ -1,11 +1,12 @@
 import App from './app';
-import CommandHandlerBase from './shared/command-handler';
+import BaseCommandHandler from './shared/command-handler';
+import * as diff from './shared/diff';
 import Settings from './shared/settings';
 import StateManager from './shared/state-manager';
 
 declare var atom: any;
 
-export default class CommandHandler implements CommandHandlerBase {
+export default class CommandHandler extends BaseCommandHandler {
     private app: App;
     private settings: Settings;
     private state: StateManager;
@@ -13,6 +14,7 @@ export default class CommandHandler implements CommandHandlerBase {
     private ignorePatternsData: any = null;
 
     constructor(app: App, state: StateManager, settings: Settings) {
+        super();
         this.app = app;
         this.state = state;
         this.settings = settings;
@@ -26,10 +28,6 @@ export default class CommandHandler implements CommandHandlerBase {
         }
 
         atom.commands.dispatch(view, command);
-    }
-
-    private focus() {
-        this.app.focusEditor();
     }
 
     private ignorePatterns() {
@@ -87,36 +85,36 @@ export default class CommandHandler implements CommandHandlerBase {
         return result;
     }
 
-    private setSourceAndCursor(source: string, cursor: number) {
+    async focus(): Promise<any> {
+        this.app.focusEditor();
+    }
+
+    getActiveEditorText(): string|undefined {
+        const editor = atom.workspace.getActiveTextEditor();
+        if (!editor) {
+            return undefined;
+        }
+
+        return editor.getText();
+    }
+
+    getState(): StateManager {
+        return this.state;
+    }
+
+    async scrollToCursor(): Promise<any> {
+    }
+
+    setSourceAndCursor(_before: string, source: string, row: number, column: number) {
         let editor = atom.workspace.getActiveTextEditor();
         if (!editor) {
             return;
         }
 
-        // iterate until the given substring index, incrementing rows and columns as we go
-        let row = 0;
-        let column = 0;
-        for (let i = 0; i < cursor; i++) {
-            column++;
-            if (source[i] == '\n') {
-                row++;
-                column = 0;
-            }
-        }
-
         // set the text and the cursor in the same transcation, so undo/redo use the correct cursor position
         editor.transact(() => {
-            editor.setText(source || '');
+            editor.setText(source);
             editor.setCursorBufferPosition([row, column]);
-        });
-    }
-
-    private async uiDelay() {
-        // wait enough time for UI updates to actually happen
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve();
-            }, 300);
         });
     }
 
@@ -146,7 +144,7 @@ export default class CommandHandler implements CommandHandlerBase {
     }
 
     async COMMAND_TYPE_DIFF(data: any): Promise<any> {
-        this.setSourceAndCursor(data.source, data.cursor);
+        await this.updateEditor(data.source, data.cursor);
         this.focus();
     }
 
@@ -163,7 +161,7 @@ export default class CommandHandler implements CommandHandlerBase {
         let column = position.column;
         let text = editor.getText();
 
-        // iterate through text, incrementing rows when newlines are found, and counting columsn when row is right
+        // iterate through text, incrementing rows when newlines are found, and counting columns when row is right
         let cursor = 0;
         let currentRow = 0;
         let currentColumn = 0;
@@ -293,7 +291,7 @@ export default class CommandHandler implements CommandHandlerBase {
             updatedCursor--;
         }
 
-        this.setSourceAndCursor(
+        await this.updateEditor(
             source.substring(0, insertionPoint) + text + source.substring(insertionPoint), updatedCursor
         );
     }
@@ -352,7 +350,7 @@ export default class CommandHandler implements CommandHandlerBase {
     }
 
     async COMMAND_TYPE_SNIPPET_EXECUTED(data: any): Promise<any> {
-        this.setSourceAndCursor(data.source, data.cursor);
+        await this.updateEditor(data.source, data.cursor);
         this.focus();
     }
 
@@ -377,7 +375,7 @@ export default class CommandHandler implements CommandHandlerBase {
 
     async COMMAND_TYPE_USE(data: any): Promise<any> {
         let index = data.index ? data.index - 1 : 0;
-        this.state.set('highlighted', index);
+        this.state.set('highlightedAlternative', index);
         let alternatives = this.state.get('alternatives');
         if ('type' in alternatives && alternatives.type == 'files') {
             this.openPendingFileAtIndex(index);

@@ -2,6 +2,7 @@ import * as Atom from 'atom';
 
 import AlternativesPanel from './alternatives-panel';
 import BaseAlternatives from './shared/alternatives';
+import {DiffRange, DiffRangeType} from './shared/diff';
 import IPC from './shared/ipc';
 import Settings from './shared/settings';
 import StateManager from './shared/state-manager';
@@ -22,6 +23,20 @@ export default class Alternatives extends BaseAlternatives {
         this.alternativesPanel = alternativesPanel;
     }
 
+    private createPanel() {
+        this.container = document.createElement('div');
+        this.container.innerHTML = this.alternativesPanel.html();
+
+        (this.$('.input-login-email')! as any).getModel().setPlaceholderText('Email');
+        (this.$('.input-login-password')! as any).getModel().setPlaceholderText('Password');
+        (this.$('.input-register-name')! as any).getModel().setPlaceholderText('Full name');
+        (this.$('.input-register-email')! as any).getModel().setPlaceholderText('Email');
+        (this.$('.input-register-password')! as any).getModel().setPlaceholderText('Password');
+
+        this.panel = atom.workspace.addRightPanel({item: this.container, visible: false});
+        this.panel.show();
+    }
+
     $(e: string): HTMLElement|null {
         return this.container!.querySelector(e);
     }
@@ -37,61 +52,15 @@ export default class Alternatives extends BaseAlternatives {
     initialize() {
         this.createPanel();
 
-        this.state.subscribe('alternatives', (data, previous) => {
-            this.onAlternatives(data, previous);
-        });
-
-        this.state.subscribe('appState', (data, previous) => {
-            this.onAppState(data, previous);
-        });
-
-        this.state.subscribe('highlighted', (data, previous) => {
-            this.onHighlighted(data, previous);
-        });
-
-        this.state.subscribe('listening', (data, previous) => {
-            this.onListening(data, previous);
-        });
-
-        this.state.subscribe('loading', (data, previous) => {
-            this.onLoading(data, previous);
-        });
-
-        this.state.subscribe('loginError', (data, previous) => {
-            this.onLoginError(data, previous);
-        });
-
-        this.state.subscribe('nuxCompleted', (data, previous) => {
-            this.onNuxCompleted(data, previous);
-        });
-
-        this.state.subscribe('nuxStep', (data, previous) => {
-            this.onNuxStep(data, previous);
-        });
-
-        this.state.subscribe('status', (data, previous) => {
-            this.onStatus(data, previous);
-        });
-
-        this.state.subscribe('volume', (data, previous) => {
-            this.onVolume(data, previous);
-        });
+        const prototype = Object.getPrototypeOf(this);
+        const events = this.eventHandlers();
+        for (const key of Object.keys(events)) {
+            this.state.subscribe(key, (data: any, previous: any) => {
+                prototype[events[key].name].call(this, data, previous);
+            });
+        }
 
         super.initialize();
-    }
-
-    private createPanel() {
-        this.container = document.createElement('div');
-        this.container.innerHTML = this.alternativesPanel.html();
-
-        (this.$('.input-login-email')! as any).getModel().setPlaceholderText('Email');
-        (this.$('.input-login-password')! as any).getModel().setPlaceholderText('Password');
-        (this.$('.input-register-name')! as any).getModel().setPlaceholderText('Full name');
-        (this.$('.input-register-email')! as any).getModel().setPlaceholderText('Email');
-        (this.$('.input-register-password')! as any).getModel().setPlaceholderText('Password');
-
-        this.panel = atom.workspace.addRightPanel({item: this.container, visible: false});
-        this.panel.show();
     }
 
     getLoginFields(): {email: string, password: string} {
@@ -111,6 +80,32 @@ export default class Alternatives extends BaseAlternatives {
 
     getState(key: string) {
         return this.state.get(key);
+    }
+
+    onHighlightedRanges(ranges: DiffRange[], _previous: DiffRange[]) {
+        const duration = 250;
+        const steps = [1, 2, 3, 4, 3, 2, 1];
+        const step = duration / steps.length;
+        const editor = atom.workspace.getActiveTextEditor();
+        if (!editor || ranges.length == 0) {
+            return;
+        }
+
+        for (let range of ranges) {
+            for (let i = 0; i < steps.length; i++) {
+                setTimeout(() => {
+                    const marker = editor.markBufferRange([range.start, range.stop]);
+                    editor.decorateMarker(marker, {
+                        'type': 'highlight',
+                        'class': range.diffRangeType == DiffRangeType.Delete ? `error-color-${steps[i]}` :
+                                                                               `success-color-${steps[i]}`
+                    });
+                    setTimeout(() => {
+                        marker.destroy();
+                    }, step);
+                }, i * step);
+            }
+        }
     }
 
     sendIPC(message: string, data: {[key: string]: any}) {
