@@ -140,6 +140,12 @@
   height: 36px;
   width: 100%;
 }
+.alternatives-panel .alternatives-login-container .alternatives-pre-login-buttons .btn-pre-skip {
+  display: block;
+  margin-top: 4px;
+  text-align: center;
+  text-decoration: underline;
+}
 .alternatives-panel .alternatives-login-container .btn-login .lds-ring, .alternatives-panel .alternatives-login-container .btn-register .lds-ring {
   color: var(--button-foreground-color);
   margin-left: 5px;

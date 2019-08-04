@@ -6,7 +6,7 @@ export default class AlternativesPanel extends BaseAlternativesPanel {
 <atom-text-editor tabindex="1" class="input-login-email" mini="true"></atom-text-editor>
 <atom-text-editor tabindex="2" class="input-login-password" mini="true"></atom-text-editor>
 <button class="btn btn-login">
-    Sign in
+    Log in to Serenade
     <div class="lds-ring hidden"><div></div><div></div><div></div><div></div></div>
 </button>
 <a href="#" class="btn-login-alt btn-pre-register">Or sign up for an account</a>
