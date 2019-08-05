@@ -138,8 +138,9 @@ export default class CommandHandler extends BaseCommandHandler {
     }
 
     async COMMAND_TYPE_DIFF(data: any): Promise<any> {
+        await this.focus();
         await this.updateEditor(data.source, data.cursor);
-        this.focus();
+        await this.focus();
     }
 
     async COMMAND_TYPE_GET_EDITOR_STATE(_data: any): Promise<any> {
