@@ -8,14 +8,12 @@ declare var atom: any;
 
 export default class CommandHandler extends BaseCommandHandler {
     private atomApp: App;
-    private settings: Settings;
     private pendingFiles: any[] = [];
     private ignorePatternsData: any = null;
 
     constructor(atomApp: App, state: StateManager, settings: Settings) {
-        super(atomApp, state);
+        super(atomApp, state, settings);
         this.atomApp = atomApp;
-        this.settings = settings;
     }
 
     private dispatch(command: string) {
