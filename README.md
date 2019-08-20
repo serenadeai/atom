@@ -4,7 +4,7 @@ Serenade enables you to write code by speaking rather than typing. With natural 
 
 [![Serenade Screenshot](https://cdn.serenade.ai/img/screenshot.png)](https://serenade.ai/)
 
-## Features
+## Take a break from typing
 
 ### Speak naturally.
 

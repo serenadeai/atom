@@ -1,0 +1,33 @@
+.success-color-1 {
+  background: rgba(43, 161, 67, 0.1);
+}
+
+.success-color-2 {
+  background: rgba(43, 161, 67, 0.2);
+}
+
+.success-color-3 {
+  background: rgba(43, 161, 67, 0.3);
+}
+
+.success-color-4 {
+  background: rgba(43, 161, 67, 0.4);
+}
+
+.error-color-1 {
+  background: rgba(255, 99, 71, 0.1);
+}
+
+.error-color-2 {
+  background: rgba(255, 99, 71, 0.2);
+}
+
+.error-color-3 {
+  background: rgba(255, 99, 71, 0.3);
+}
+
+.error-color-4 {
+  background: rgba(255, 99, 71, 0.4);
+}
+
+/*# sourceMappingURL=global.css.map */

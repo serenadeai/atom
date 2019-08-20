@@ -1,47 +1,31 @@
 {
-    "name": "serenade",
-    "description": "Code with voice. Learn more at https://serenade.ai.",
-    "displayName": "Serenade",
-    "license": "UNLICENSED",
-    "repository": "https://github.com/serenadeai/atom",
-    "main": "./build/extension",
-    "styleSheets": [
-        "fontawesome.min.css",
-        "solid.min.css",
-        "exports.less",
-        "alternatives-panel.css",
-        "serenade.less"
-    ],
-    "version": "1.0.6",
-    "engines": {
-        "atom": ">=1.0.0 <2.0.0"
-    },
-    "keywords": [
-        "voice",
-        "accessibility"
-    ],
-    "scripts": {
-        "compile": "sass ../serenade-editor-shared/alternatives-panel.scss ../serenade-editor-shared/build/alternatives-panel.css && webpack --mode production",
-        "dev": "webpack --mode development --watch"
-    },
-    "dependencies": {
-        "mkdirp": "0.5.1",
-        "rimraf": "2.6.3",
-        "targz": "1.0.1",
-        "tree-kill": "1.2.1"
-    },
-    "devDependencies": {
-        "@types/atom": "^1.36.1",
-        "@types/mkdirp": "^0.5.2",
-        "@types/mocha": "^2.2.42",
-        "@types/node": "^10.14.12",
-        "@types/rimraf": "^2.0.2",
-        "@types/targz": "^1.0.0",
-        "copy-webpack-plugin": "^5.0.3",
-        "ts-loader": "^6.0.4",
-        "tslint": "^5.12.1",
-        "typescript": "^3.5.2",
-        "webpack": "^4.35.0",
-        "webpack-cli": "^3.3.5"
-    }
+  "name": "serenade",
+  "description": "Code with voice. Learn more at https://serenade.ai.",
+  "displayName": "Serenade",
+  "license": "MIT",
+  "repository": "https://github.com/serenadeai/atom",
+  "main": "./build/extension",
+  "version": "1.0.6",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "keywords": ["voice", "accessibility"],
+  "scripts": {
+    "compile": "sass ../serenade-editor-shared/src/global.scss ../serenade-editor-shared/build/global.css && webpack --mode production",
+    "dev": "webpack --mode development --watch"
+  },
+  "dependencies": {
+    "mkdirp": "0.5.1"
+  },
+  "devDependencies": {
+    "@types/atom": "^1.36.1",
+    "@types/mkdirp": "^0.5.2",
+    "@types/node": "^10.14.12",
+    "copy-webpack-plugin": "^5.0.3",
+    "ts-loader": "^6.0.4",
+    "tslint": "^5.12.1",
+    "typescript": "^3.5.2",
+    "webpack": "^4.35.0",
+    "webpack-cli": "^3.3.5"
+  }
 }
