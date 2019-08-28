@@ -1,0 +1,9 @@
+.serenade-message {
+    text-align: center;
+    font-size: 15px;
+    padding: 10px;
+}
+
+.serenade-message .btn {
+    margin-left: 10px;
+}

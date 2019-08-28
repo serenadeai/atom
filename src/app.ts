@@ -26,7 +26,17 @@ export default class App extends BaseApp {
     this.subscriptions!.dispose();
   }
 
-  initialize() {
+  showInstallMessage() {
+    const message = document.createElement("div");
+    message.innerHTML = `
+<div class="serenade-message">
+  Download the new Serenade app to use Serenade with Atom. <a class="btn notification-download" href="https://serenade.ai/download" target="_blank">Download</a>
+</div>
+`;
+    atom.workspace.addTopPanel({ item: message });
+  }
+
+  async initialize() {
     if (this.ipc) {
       return;
     }
