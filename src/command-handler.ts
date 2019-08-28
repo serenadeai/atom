@@ -24,7 +24,7 @@ export default class CommandHandler extends BaseCommandHandler {
       let directory = [];
       let file = [];
 
-      for (let pattern of this.settings.get("ignore")) {
+      for (let pattern of this.settings.getIgnore()) {
         if (pattern.endsWith("/")) {
           directory.push(pattern.replace(/\/+$/g, ""));
         } else {

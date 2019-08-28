@@ -6,9 +6,9 @@ import IPC from "./shared/ipc";
 import Settings from "./shared/settings";
 
 export default class App extends BaseApp {
-  commandHandler?: CommandHandler;
-  settings?: Settings;
-  subscriptions?: Atom.CompositeDisposable;
+  private commandHandler?: CommandHandler;
+  private subscriptions?: Atom.CompositeDisposable;
+  private panel?: Atom.Panel;
 
   activate() {
     this.initialize();
@@ -26,14 +26,39 @@ export default class App extends BaseApp {
     this.subscriptions!.dispose();
   }
 
-  showInstallMessage() {
+  hidePanel() {
+    if (!this.panel) {
+      return;
+    }
+
+    this.panel!.destroy();
+  }
+
+  showMessage(content: string) {
+    this.hidePanel();
+
     const message = document.createElement("div");
     message.innerHTML = `
 <div class="serenade-message">
-  Download the new Serenade app to use Serenade with Atom. <a class="btn notification-download" href="https://serenade.ai/download" target="_blank">Download</a>
-</div>
-`;
-    atom.workspace.addTopPanel({ item: message });
+  <div class="serenade-message-content">${content}</div>
+  <a href="#" class="serenade-message-close">&times;</a>
+</div>`;
+    message.querySelector(".serenade-message-close")!.addEventListener("click", (e: any) => {
+      e.preventDefault();
+      this.hidePanel();
+    });
+
+    this.panel = atom.workspace.addTopPanel({ item: message });
+  }
+
+  showInstallMessage() {
+    this.showMessage(
+      `Download the new Serenade app to use Serenade with Atom. <a class="btn notification-download" href="https://serenade.ai/download" target="_blank">Download</a>`
+    );
+  }
+
+  showNotRunningMessage() {
+    this.showMessage("Open the Serenade app to use Serenade with Atom.");
   }
 
   async initialize() {
@@ -43,7 +68,9 @@ export default class App extends BaseApp {
 
     this.settings = new Settings();
     this.commandHandler = new CommandHandler(this.settings);
-    this.ipc = new IPC(this.commandHandler, 17375);
+    this.ipc = new IPC(this.commandHandler, 17375, () => {
+      this.hidePanel();
+    });
     this.commandHandler.pollActiveEditor();
 
     this.run();
