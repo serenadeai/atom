@@ -1,14 +1,14 @@
 import App from "./app";
 import BaseCommandHandler from "./shared/command-handler";
 import * as diff from "./shared/diff";
+import * as minimatch from "minimatch";
 import Settings from "./shared/settings";
 
 declare var atom: any;
 
 export default class CommandHandler extends BaseCommandHandler {
   private activeEditor: any = atom.workspace.getActiveTextEditor();
-  private ignorePatternsData: any = null;
-  private pendingFiles: any[] = [];
+  private openFileList: any[] = [];
 
   private dispatch(command: string) {
     let view = atom.workspace.getActivePane();
@@ -19,57 +19,37 @@ export default class CommandHandler extends BaseCommandHandler {
     atom.commands.dispatch(view, command);
   }
 
-  private ignorePatterns() {
-    if (this.ignorePatternsData == null) {
-      let directory = [];
-      let file = [];
-
-      for (let pattern of this.settings.getIgnore()) {
-        if (pattern.endsWith("/")) {
-          directory.push(pattern.replace(/\/+$/g, ""));
-        } else {
-          file.push(pattern);
-        }
-      }
-
-      this.ignorePatternsData = {
-        directory: new RegExp(directory.join("|")),
-        file: new RegExp(file.join("|"))
-      };
-    }
-
-    return this.ignorePatternsData;
+  private ignorePatterns(): any {
+    return this.settings
+      .getIgnore()
+      .map((e: string) => `(${e})`)
+      .join("|");
   }
 
-  private openPendingFileAtIndex(index: number) {
-    if (index < 0 || index >= this.pendingFiles.length) {
-      return;
-    }
-
-    atom.workspace.open(this.pendingFiles[index].getPath());
-  }
-
-  private searchFiles(query: string, root: any): any {
+  private searchFiles(query: string, root: any): any[] {
     // we want to look for any substring match, so replace spaces with wildcard
     let re = new RegExp(query.toLowerCase().replace(/ /g, "(.*)"));
 
     // skip over ignored directories
-    if (root.getPath().match(this.ignorePatterns().directory)) {
+    if (minimatch(root.getPath(), this.ignorePatterns())) {
       return [];
     }
 
     let result = [];
-    let ignoreFile = this.ignorePatterns().file;
     for (let e of root.getEntriesSync()) {
       if (e.isDirectory()) {
         result.push(...this.searchFiles(query, e));
       } else if (e.isFile()) {
+        if (minimatch(e.getPath(), this.ignorePatterns())) {
+          continue;
+        }
+
         // check for a substring match, ignoring case, directory separators, and dots
         let path = e
           .getPath()
           .toLowerCase()
           .replace(/\/|\./g, "");
-        if (path.search(re) > -1 && (!ignoreFile || !path.match(ignoreFile))) {
+        if (path.search(re) > -1) {
           result.push(e);
         }
       }
@@ -94,7 +74,7 @@ export default class CommandHandler extends BaseCommandHandler {
   }
 
   highlightRanges(ranges: diff.DiffRange[]) {
-    const duration = 250;
+    const duration = 300;
     const steps = [1, 2, 3, 4, 3, 2, 1];
     const step = duration / steps.length;
     if (!this.activeEditor || ranges.length == 0) {
@@ -167,12 +147,15 @@ export default class CommandHandler extends BaseCommandHandler {
     await this.uiDelay();
   }
 
-  async COMMAND_TYPE_DIFF(data: any): Promise<any> {
-    await this.updateEditor(data.source, data.cursor);
-  }
-
   async COMMAND_TYPE_GET_EDITOR_STATE(_data: any): Promise<any> {
-    let result = { source: "", cursor: 0, filename: "" };
+    let result = {
+      source: "",
+      cursor: 0,
+      filename: "",
+      files: this.openFileList.map(e => e.getPath()),
+      roots: atom.project.getPaths()
+    };
+
     if (!this.activeEditor) {
       return result;
     }
@@ -217,30 +200,19 @@ export default class CommandHandler extends BaseCommandHandler {
   }
 
   async COMMAND_TYPE_OPEN_FILE(data: any): Promise<any> {
-    // sort the project root paths by length, longest first
-    let roots = atom.project.getPaths();
-    roots.sort((a: any[], b: any[]) => {
-      return b.length - a.length;
-    });
+    atom.workspace.open(this.openFileList[data.index || 0].getPath());
+  }
 
-    let result = [];
-    for (let e of atom.project.getDirectories()) {
-      result.push(...this.searchFiles(data.path, e));
+  async COMMAND_TYPE_OPEN_FILE_LIST(data: any): Promise<any> {
+    this.openFileList = [];
+    for (const e of atom.project.getDirectories()) {
+      this.openFileList.push(...this.searchFiles(data.path, e));
     }
 
-    this.pendingFiles = result;
-    let alternatives = result.map(e => {
-      // remove the longest root that's a prefix of the given path
-      let path = e.getPath();
-      for (let root of roots) {
-        if (path.startsWith(root)) {
-          path = path.substring(root.length + 1);
-          break;
-        }
-      }
-
-      return { description: `open <code>${path}</code>` };
-    });
+    // the current request has to complete before we can send a new one
+    setTimeout(() => {
+      this.ipcClient!.send("mic", { type: "sendText", text: `open executed ${data.path};` });
+    }, 100);
   }
 
   async COMMAND_TYPE_PASTE(data: any): Promise<any> {

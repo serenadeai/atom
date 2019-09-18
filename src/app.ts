@@ -1,12 +1,8 @@
 import * as Atom from "atom";
-
 import BaseApp from "./shared/app";
 import CommandHandler from "./command-handler";
-import IPC from "./shared/ipc";
-import Settings from "./shared/settings";
 
 export default class App extends BaseApp {
-  private commandHandler?: CommandHandler;
   private subscriptions?: Atom.CompositeDisposable;
   private panel?: Atom.Panel;
 
@@ -21,12 +17,16 @@ export default class App extends BaseApp {
     );
   }
 
+  createCommandHandler(): CommandHandler {
+    return new CommandHandler(this.ipcClient!, this.settings!);
+  }
+
   deactivate() {
     this.destroy();
     this.subscriptions!.dispose();
   }
 
-  hidePanel() {
+  hideMessage() {
     if (!this.panel) {
       return;
     }
@@ -35,7 +35,7 @@ export default class App extends BaseApp {
   }
 
   showMessage(content: string) {
-    this.hidePanel();
+    this.hideMessage();
 
     const message = document.createElement("div");
     message.innerHTML = `
@@ -45,10 +45,14 @@ export default class App extends BaseApp {
 </div>`;
     message.querySelector(".serenade-message-close")!.addEventListener("click", (e: any) => {
       e.preventDefault();
-      this.hidePanel();
+      this.hideMessage();
     });
 
     this.panel = atom.workspace.addTopPanel({ item: message });
+  }
+
+  port() {
+    return 17375;
   }
 
   showInstallMessage() {
@@ -62,17 +66,11 @@ export default class App extends BaseApp {
   }
 
   async initialize() {
-    if (this.ipc) {
+    if (this.ipcServer) {
       return;
     }
 
-    this.settings = new Settings();
-    this.commandHandler = new CommandHandler(this.settings);
-    this.ipc = new IPC(this.commandHandler, 17375, () => {
-      this.hidePanel();
-    });
-    this.commandHandler.pollActiveEditor();
-
     this.run();
+    (this.commandHandler! as CommandHandler).pollActiveEditor();
   }
 }

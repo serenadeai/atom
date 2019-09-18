@@ -9,12 +9,17 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-  "keywords": ["voice", "accessibility"],
+  "keywords": [
+    "voice",
+    "accessibility"
+  ],
   "scripts": {
     "compile": "sass ../serenade-editor-shared/src/global.scss ../serenade-editor-shared/build/global.css && webpack --mode production",
     "dev": "webpack --mode development --watch"
   },
   "dependencies": {
+    "@types/minimatch": "^3.0.3",
+    "minimatch": "^3.0.4",
     "mkdirp": "0.5.1"
   },
   "devDependencies": {
