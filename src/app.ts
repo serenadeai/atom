@@ -18,7 +18,7 @@ export default class App extends BaseApp {
   }
 
   createCommandHandler(): CommandHandler {
-    return new CommandHandler(this.ipcClient!, this.settings!);
+    return new CommandHandler(this.settings!);
   }
 
   deactivate() {
@@ -66,7 +66,7 @@ export default class App extends BaseApp {
   }
 
   async initialize() {
-    if (this.ipcServer) {
+    if (this.ipc) {
       return;
     }
 

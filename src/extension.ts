@@ -1,11 +1,11 @@
-import App from './app';
+import App from "./app";
 
 const app = new App();
 
 export function activate(_state: any) {
-    app.activate();
+  app.activate();
 }
 
 export function deactivate() {
-    app.deactivate();
+  app.deactivate();
 }

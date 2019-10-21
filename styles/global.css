@@ -14,6 +14,14 @@
   background: rgba(43, 161, 67, 0.4);
 }
 
+.success-color-5 {
+  background: rgba(43, 161, 67, 0.5);
+}
+
+.success-color-6 {
+  background: rgba(43, 161, 67, 0.6);
+}
+
 .error-color-1 {
   background: rgba(255, 99, 71, 0.1);
 }
@@ -28,6 +36,14 @@
 
 .error-color-4 {
   background: rgba(255, 99, 71, 0.4);
+}
+
+.error-color-5 {
+  background: rgba(255, 99, 71, 0.5);
+}
+
+.error-color-6 {
+  background: rgba(255, 99, 71, 0.6);
 }
 
 /*# sourceMappingURL=global.css.map */
