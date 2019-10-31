@@ -34,35 +34,31 @@ export default class App extends BaseApp {
     this.panel!.destroy();
   }
 
-  showMessage(content: string) {
-    this.hideMessage();
-
-    const message = document.createElement("div");
-    message.innerHTML = `
-<div class="serenade-message">
-  <div class="serenade-message-content">${content}</div>
-  <a href="#" class="serenade-message-close">&times;</a>
-</div>`;
-    message.querySelector(".serenade-message-close")!.addEventListener("click", (e: any) => {
-      e.preventDefault();
-      this.hideMessage();
-    });
-
-    this.panel = atom.workspace.addTopPanel({ item: message });
-  }
-
   port() {
     return 17375;
   }
 
   showInstallMessage() {
-    this.showMessage(
-      `Download the new Serenade app to use Serenade with Atom. <a class="btn notification-download" href="https://serenade.ai/download" target="_blank">Download</a>`
-    );
-  }
+    this.hideMessage();
 
-  showNotRunningMessage() {
-    this.showMessage("Open the Serenade app to use Serenade with Atom.");
+    const message = document.createElement("div");
+    message.innerHTML = `
+<div class="serenade-message">
+  <a href="#" class="serenade-message-close">&times;</a>
+  <div class="serenade-message-content">
+    <h1>Welcome to Serenade!</h1>
+    <p>With Serenade, you can write code faster&mdash;by speaking in plain English, rather than typing. Use Serenade as your coding assistant, or abandon your keyboard entirely.</p>
+    <p>To get started, download the Serenade app.</p>
+    <a class="serenade-download" href="https://serenade.ai/download">Download</a>
+  </div>
+</div>`;
+
+    message.querySelector(".serenade-message-close")!.addEventListener("click", (e: any) => {
+      e.preventDefault();
+      this.hideMessage();
+    });
+
+    this.panel = atom.workspace.addRightPanel({ item: message });
   }
 
   async initialize() {
