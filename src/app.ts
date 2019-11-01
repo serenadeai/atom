@@ -39,8 +39,6 @@ export default class App extends BaseApp {
   }
 
   showInstallMessage() {
-    this.hideMessage();
-
     const message = document.createElement("div");
     message.innerHTML = `
 <div class="serenade-message">
@@ -49,12 +47,16 @@ export default class App extends BaseApp {
     <h1>Welcome to Serenade!</h1>
     <p>With Serenade, you can write code faster&mdash;by speaking in plain English, rather than typing. Use Serenade as your coding assistant, or abandon your keyboard entirely.</p>
     <p>To get started, download the Serenade app.</p>
-    <a class="serenade-download" href="https://serenade.ai/download">Download</a>
+    <a class="serenade-download" href="https://serenade.ai/app">Download</a>
   </div>
 </div>`;
 
     message.querySelector(".serenade-message-close")!.addEventListener("click", (e: any) => {
       e.preventDefault();
+      this.hideMessage();
+    });
+
+    message.querySelector(".serenade-download")!.addEventListener("click", () => {
       this.hideMessage();
     });
 
