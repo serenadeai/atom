@@ -102,13 +102,17 @@ export default class CommandHandler extends BaseCommandHandler {
 
   pollActiveEditor() {
     setInterval(() => {
-      const editor = atom.workspace.getActiveTextEditor();
-      if (!editor) {
-        return;
-      }
-
-      this.activeEditor = editor;
+      this.reloadActiveEditor();
     }, 1000);
+  }
+
+  reloadActiveEditor() {
+    const editor = atom.workspace.getActiveTextEditor();
+    if (!editor) {
+      return;
+    }
+
+    this.activeEditor = editor;
   }
 
   async scrollToCursor(): Promise<any> {}
@@ -125,14 +129,24 @@ export default class CommandHandler extends BaseCommandHandler {
     });
   }
 
+  async uiDelay() {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve();
+      }, 300);
+    });
+  }
+
   async COMMAND_TYPE_CLOSE_TAB(_data: any): Promise<any> {
     atom.workspace.getActivePane().destroyActiveItem();
     await this.uiDelay();
+    this.reloadActiveEditor();
   }
 
   async COMMAND_TYPE_CLOSE_WINDOW(_data: any): Promise<any> {
     this.dispatch("pane:close");
     await this.uiDelay();
+    this.reloadActiveEditor();
   }
 
   async COMMAND_TYPE_COPY(data: any): Promise<any> {
@@ -145,6 +159,7 @@ export default class CommandHandler extends BaseCommandHandler {
     await this.focus();
     atom.workspace.open();
     await this.uiDelay();
+    this.reloadActiveEditor();
   }
 
   async COMMAND_TYPE_GET_EDITOR_STATE(_data: any): Promise<any> {
@@ -197,6 +212,7 @@ export default class CommandHandler extends BaseCommandHandler {
     await this.focus();
     atom.workspace.getActivePane().activateNextItem();
     await this.uiDelay();
+    this.reloadActiveEditor();
   }
 
   async COMMAND_TYPE_OPEN_FILE(data: any): Promise<any> {
@@ -229,6 +245,7 @@ export default class CommandHandler extends BaseCommandHandler {
     await this.focus();
     atom.workspace.getActivePane().activatePreviousItem();
     await this.uiDelay();
+    this.reloadActiveEditor();
   }
 
   async COMMAND_TYPE_REDO(_data: any): Promise<any> {
@@ -258,12 +275,14 @@ export default class CommandHandler extends BaseCommandHandler {
     await this.focus();
     this.dispatch("pane:split-" + data.direction + "-and-copy-active-item");
     await this.uiDelay();
+    this.reloadActiveEditor();
   }
 
   async COMMAND_TYPE_SWITCH_TAB(data: any): Promise<any> {
     await this.focus();
     atom.workspace.getActivePane().activateItemAtIndex(data.index - 1);
     await this.uiDelay();
+    this.reloadActiveEditor();
   }
 
   async COMMAND_TYPE_UNDO(_data: any): Promise<any> {
@@ -280,5 +299,6 @@ export default class CommandHandler extends BaseCommandHandler {
     let commands: any = { left: "on-left", right: "on-right", up: "above", down: "below" };
     this.dispatch("window:focus-pane-" + commands[data.direction]);
     await this.uiDelay();
+    this.reloadActiveEditor();
   }
 }
