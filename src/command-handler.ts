@@ -74,7 +74,7 @@ export default class CommandHandler extends BaseCommandHandler {
   }
 
   highlightRanges(ranges: diff.DiffRange[]): number {
-    const duration = 150;
+    const duration = 200;
     const steps = [1, 2, 1];
     const step = duration / steps.length;
     if (!this.activeEditor || ranges.length == 0) {
@@ -99,7 +99,7 @@ export default class CommandHandler extends BaseCommandHandler {
       }
     }
 
-    return 200;
+    return 250;
   }
 
   pollActiveEditor() {
@@ -240,7 +240,7 @@ export default class CommandHandler extends BaseCommandHandler {
 
     return {
       type: "sendText",
-      text: `open executed ${data.path};`
+      text: `open executed ${data.path}`
     };
   }
 
