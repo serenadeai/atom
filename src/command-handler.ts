@@ -59,8 +59,7 @@ export default class CommandHandler extends BaseCommandHandler {
   }
 
   async focus(): Promise<any> {
-    const focused = atom.workspace.getActiveTextEditor();
-    if (!focused && this.activeEditor) {
+    if (this.activeEditor) {
       atom.workspace.paneForItem(this.activeEditor!)!.activate();
     }
   }
