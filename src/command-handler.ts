@@ -19,36 +19,35 @@ export default class CommandHandler extends BaseCommandHandler {
     atom.commands.dispatch(view, command);
   }
 
-  private ignorePatterns(): any {
-    return this.settings
-      .getIgnore()
-      .map((e: string) => `(${e})`)
-      .join("|");
+  private ignorePattern(): RegExp {
+    return new RegExp(
+      this.settings
+        .getIgnore()
+        .map((e: string) => `(${new minimatch.Minimatch(e).makeRe().source})`)
+        .join("|")
+    );
   }
 
-  private searchFiles(query: string, root: any): any[] {
-    // we want to look for any substring match, so replace spaces with wildcard
-    let re = new RegExp(query.toLowerCase().replace(/ /g, "(.*)"));
-
+  private searchFiles(re: RegExp, root: any, directory: any): any[] {
     // skip over ignored directories
-    if (minimatch(root.getPath(), this.ignorePatterns())) {
+    const directoryWithoutRoot = directory.getPath().substring(root.getPath().length);
+    if (this.ignorePattern().test(directoryWithoutRoot)) {
       return [];
     }
 
     let result = [];
-    for (let e of root.getEntriesSync()) {
+    for (const e of directory.getEntriesSync()) {
       if (e.isDirectory()) {
-        result.push(...this.searchFiles(query, e));
+        result.push(...this.searchFiles(re, root, e));
       } else if (e.isFile()) {
-        if (minimatch(e.getPath(), this.ignorePatterns())) {
+        // skip over ignored files
+        const fileWithoutRoot = e.getPath().substring(root.getPath().length);
+        if (this.ignorePattern().test(fileWithoutRoot)) {
           continue;
         }
 
         // check for a substring match, ignoring case, directory separators, and dots
-        let path = e
-          .getPath()
-          .toLowerCase()
-          .replace(/\/|\./g, "");
+        const path = fileWithoutRoot.toLowerCase().replace(/\/|\./g, "");
         if (path.search(re) > -1) {
           result.push(e);
         }
@@ -232,9 +231,12 @@ export default class CommandHandler extends BaseCommandHandler {
   }
 
   async COMMAND_TYPE_OPEN_FILE_LIST(data: any): Promise<any> {
+    // we want to look for any substring match, so replace spaces with wildcard
+    const re = new RegExp(data.path.toLowerCase().replace(/ /g, "(.*)"));
+
     this.openFileList = [];
     for (const e of atom.project.getDirectories()) {
-      this.openFileList.push(...this.searchFiles(data.path, e));
+      this.openFileList.push(...this.searchFiles(re, e, e));
     }
 
     return {
