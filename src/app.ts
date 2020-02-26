@@ -47,7 +47,7 @@ export default class App extends BaseApp {
     <h1>Welcome to Serenade!</h1>
     <p>With Serenade, you can write code faster&mdash;by speaking in plain English, rather than typing. Use Serenade as your coding assistant, or abandon your keyboard entirely.</p>
     <p>To get started, download the Serenade app and run it alongside Atom.</p>
-    <a class="serenade-download" href="https://serenade.ai/request">Download</a>
+    <a class="serenade-download" href="https://serenade.ai/">Download</a>
   </div>
 </div>`;
 
