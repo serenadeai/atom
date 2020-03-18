@@ -232,17 +232,24 @@ export default class CommandHandler extends BaseCommandHandler {
 
   async COMMAND_TYPE_OPEN_FILE_LIST(data: any): Promise<any> {
     // we want to look for any substring match, so replace spaces with wildcard
-    const re = new RegExp(data.path.toLowerCase().replace(/ /g, "(.*)"));
+    const re = new RegExp(
+      data.path
+        .toLowerCase()
+        .replace(".", "")
+        .replace(/ /g, "(.*)")
+    );
 
     this.openFileList = [];
     for (const e of atom.project.getDirectories()) {
       this.openFileList.push(...this.searchFiles(re, e, e));
     }
 
-    return {
-      type: "sendText",
-      text: `open executed ${data.path}`
-    };
+    if (this.openFileList.length > 0) {
+      return {
+        type: "sendText",
+        text: `callback open`
+      };
+    }
   }
 
   async COMMAND_TYPE_PASTE(data: any): Promise<any> {
