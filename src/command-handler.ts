@@ -300,8 +300,13 @@ export default class CommandHandler extends BaseCommandHandler {
   }
 
   async COMMAND_TYPE_SWITCH_TAB(data: any): Promise<any> {
+    let index = data.index - 1;
+    if (index < 0) {
+      index = atom.workspace.getActivePane().getItems().length - 1;
+    }
+
     await this.focus();
-    atom.workspace.getActivePane().activateItemAtIndex(data.index - 1);
+    atom.workspace.getActivePane().activateItemAtIndex(index);
     await this.uiDelay();
     this.reloadActiveEditor();
   }
