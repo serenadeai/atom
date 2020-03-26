@@ -17,6 +17,10 @@ export default class App extends BaseApp {
     );
   }
 
+  app() {
+    return "atom";
+  }
+
   createCommandHandler(): CommandHandler {
     return new CommandHandler(this.settings!);
   }
@@ -32,10 +36,6 @@ export default class App extends BaseApp {
     }
 
     this.panel!.destroy();
-  }
-
-  port() {
-    return 17375;
   }
 
   showInstallMessage() {
@@ -71,5 +71,19 @@ export default class App extends BaseApp {
     this.run();
     (this.commandHandler! as CommandHandler).pollActiveEditor();
     this.settings!.setAtom();
+
+    atom.workspace.observeTextEditors(editor => {
+      editor.onDidChangeCursorPosition(() => {
+        this.ipc!.sendActive();
+      });
+    });
+
+    atom.workspace.observeActivePane(() => {
+      this.ipc!.sendActive();
+    });
+
+    atom.workspace.observeActivePaneItem(() => {
+      this.ipc!.sendActive();
+    });
   }
 }

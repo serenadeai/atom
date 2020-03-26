@@ -214,7 +214,10 @@ export default class CommandHandler extends BaseCommandHandler {
     result.source = text;
     result.cursor = cursor;
     result.filename = this.activeEditor!.getPath();
-    return result;
+    return {
+      message: "editorState",
+      data: result
+    };
   }
 
   async COMMAND_TYPE_GO_TO_DEFINITION(_data: any): Promise<any> {}
@@ -246,8 +249,10 @@ export default class CommandHandler extends BaseCommandHandler {
 
     if (this.openFileList.length > 0) {
       return {
-        type: "sendText",
-        text: `callback open`
+        message: "sendText",
+        data: {
+          text: `callback open`
+        }
       };
     }
   }
