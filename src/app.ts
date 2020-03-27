@@ -78,12 +78,22 @@ export default class App extends BaseApp {
       });
     });
 
-    atom.workspace.observeActivePane(() => {
-      this.ipc!.sendActive();
+    atom.workspace.observeActiveTextEditor(editor => {
+      if (editor) {
+        this.ipc!.sendActive();
+      }
     });
 
-    atom.workspace.observeActivePaneItem(() => {
-      this.ipc!.sendActive();
+    atom.workspace.observeActivePane(pane => {
+      if (pane) {
+        this.ipc!.sendActive();
+      }
+    });
+
+    atom.workspace.observeActivePaneItem(item => {
+      if (item) {
+        this.ipc!.sendActive();
+      }
     });
   }
 }
