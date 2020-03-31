@@ -6,6 +6,11 @@ export default class App extends BaseApp {
   private subscriptions?: Atom.CompositeDisposable;
   private panel?: Atom.Panel;
 
+  private updateActive() {
+    this.ipc!.sendActive();
+    (this.commandHandler! as CommandHandler).reloadActiveEditor();
+  }
+
   activate() {
     this.initialize();
 
@@ -64,7 +69,7 @@ export default class App extends BaseApp {
   }
 
   async initialize() {
-    if (this.ipc) {
+    if (this.initialized) {
       return;
     }
 
@@ -74,25 +79,25 @@ export default class App extends BaseApp {
 
     atom.workspace.observeTextEditors(editor => {
       editor.onDidChangeCursorPosition(() => {
-        this.ipc!.sendActive();
+        this.updateActive();
       });
     });
 
     atom.workspace.observeActiveTextEditor(editor => {
       if (editor) {
-        this.ipc!.sendActive();
+        this.updateActive();
       }
     });
 
     atom.workspace.observeActivePane(pane => {
       if (pane) {
-        this.ipc!.sendActive();
+        this.updateActive();
       }
     });
 
     atom.workspace.observeActivePaneItem(item => {
       if (item) {
-        this.ipc!.sendActive();
+        this.updateActive();
       }
     });
   }
