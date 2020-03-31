@@ -27,7 +27,7 @@ module.exports = [
     plugins: [
       new CopyPlugin([
         {
-          from: path.resolve(__dirname, "../serenade-editor-shared/build/global.css"),
+          from: path.resolve(__dirname, "../editor-shared/build/global.css"),
           to: path.resolve(__dirname, "styles")
         }
       ])

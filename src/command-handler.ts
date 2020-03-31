@@ -19,6 +19,45 @@ export default class CommandHandler extends BaseCommandHandler {
     atom.commands.dispatch(view, command);
   }
 
+  private filenameForEditor(editor: any): string {
+    let filename = editor.getPath();
+    const known = ["js", "jsx", "vue", "ts", "tsx", "java", "py", "html", "css", "less", "scss"];
+    for (const extension of known) {
+      if (filename.endsWith(`.${extension}`)) {
+        return filename;
+      }
+    }
+
+    const scopes = editor.getRootScopeDescriptor().scopes;
+    if (scopes.length === 0) {
+      return filename;
+    }
+
+    if (!filename) {
+      filename = "file";
+    }
+
+    const scopeToFilename: { [key: string]: string } = {
+      "source.css": `${filename}.css`,
+      "text.html": `${filename}.html`,
+      "source.java": `${filename}.java`,
+      "source.js": `${filename}.js`,
+      "source.css.less": `${filename}.css`,
+      "source.python": `${filename}.py`,
+      "source.css.scss": `${filename}.css`,
+      "source.ts": `${filename}.ts`,
+      "source.tsx": `${filename}.tsx`
+    };
+
+    for (const k of Object.keys(scopeToFilename)) {
+      if (scopes[0].includes(k)) {
+        return scopeToFilename[k];
+      }
+    }
+
+    return filename;
+  }
+
   private ignorePattern(): RegExp {
     return new RegExp(
       this.settings
@@ -213,8 +252,11 @@ export default class CommandHandler extends BaseCommandHandler {
 
     result.source = text;
     result.cursor = cursor;
-    result.filename = this.activeEditor!.getPath();
-    return result;
+    result.filename = this.filenameForEditor(this.activeEditor!);
+    return {
+      message: "editorState",
+      data: result
+    };
   }
 
   async COMMAND_TYPE_GO_TO_DEFINITION(_data: any): Promise<any> {}
@@ -246,8 +288,10 @@ export default class CommandHandler extends BaseCommandHandler {
 
     if (this.openFileList.length > 0) {
       return {
-        type: "sendText",
-        text: `callback open`
+        message: "sendText",
+        data: {
+          text: `callback open`
+        }
       };
     }
   }

@@ -9,23 +9,26 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-  "keywords": [
-    "voice",
-    "accessibility"
-  ],
+  "keywords": ["voice", "accessibility"],
   "scripts": {
-    "compile": "sass ../serenade-editor-shared/src/global.scss ../serenade-editor-shared/build/global.css && webpack --mode production",
+    "compile": "sass ../editor-shared/src/global.scss ../editor-shared/build/global.css && webpack --mode production",
     "dev": "webpack --mode development --watch"
   },
   "dependencies": {
-    "@types/minimatch": "^3.0.3",
+    "bufferutil": "^4.0.1",
     "minimatch": "^3.0.4",
-    "mkdirp": "0.5.1"
+    "mkdirp": "0.5.1",
+    "utf-8-validate": "^5.0.2",
+    "uuid": "^7.0.2",
+    "ws": "^7.2.3"
   },
   "devDependencies": {
     "@types/atom": "^1.36.1",
     "@types/mkdirp": "^0.5.2",
     "@types/node": "^10.14.12",
+    "@types/minimatch": "^3.0.3",
+    "@types/uuid": "^7.0.2",
+    "@types/ws": "^7.2.3",
     "copy-webpack-plugin": "^5.0.3",
     "ts-loader": "^6.0.4",
     "tslint": "^5.12.1",

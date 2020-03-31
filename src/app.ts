@@ -6,6 +6,11 @@ export default class App extends BaseApp {
   private subscriptions?: Atom.CompositeDisposable;
   private panel?: Atom.Panel;
 
+  private updateActive() {
+    this.ipc!.sendActive();
+    (this.commandHandler! as CommandHandler).reloadActiveEditor();
+  }
+
   activate() {
     this.initialize();
 
@@ -15,6 +20,10 @@ export default class App extends BaseApp {
         "serenade:initialize": () => this.initialize()
       })
     );
+  }
+
+  app() {
+    return "atom";
   }
 
   createCommandHandler(): CommandHandler {
@@ -32,10 +41,6 @@ export default class App extends BaseApp {
     }
 
     this.panel!.destroy();
-  }
-
-  port() {
-    return 17375;
   }
 
   showInstallMessage() {
@@ -64,12 +69,36 @@ export default class App extends BaseApp {
   }
 
   async initialize() {
-    if (this.ipc) {
+    if (this.initialized) {
       return;
     }
 
     this.run();
     (this.commandHandler! as CommandHandler).pollActiveEditor();
     this.settings!.setAtom();
+
+    atom.workspace.observeTextEditors(editor => {
+      editor.onDidChangeCursorPosition(() => {
+        this.updateActive();
+      });
+    });
+
+    atom.workspace.observeActiveTextEditor(editor => {
+      if (editor) {
+        this.updateActive();
+      }
+    });
+
+    atom.workspace.observeActivePane(pane => {
+      if (pane) {
+        this.updateActive();
+      }
+    });
+
+    atom.workspace.observeActivePaneItem(item => {
+      if (item) {
+        this.updateActive();
+      }
+    });
   }
 }
