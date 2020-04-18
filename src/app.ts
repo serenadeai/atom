@@ -75,7 +75,7 @@ export default class App extends BaseApp {
 
     this.run();
     (this.commandHandler! as CommandHandler).pollActiveEditor();
-    this.settings!.setAtom();
+    this.settings!.setPluginInstalled("atom");
 
     atom.workspace.observeTextEditors(editor => {
       editor.onDidChangeCursorPosition(() => {

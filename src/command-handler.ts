@@ -1,7 +1,8 @@
+import * as fs from "fs";
+import * as globby from "globby";
 import App from "./app";
 import BaseCommandHandler from "./shared/command-handler";
 import * as diff from "./shared/diff";
-import * as minimatch from "minimatch";
 import Settings from "./shared/settings";
 
 declare var atom: any;
@@ -56,44 +57,6 @@ export default class CommandHandler extends BaseCommandHandler {
     }
 
     return filename;
-  }
-
-  private ignorePattern(): RegExp {
-    return new RegExp(
-      this.settings
-        .getIgnore()
-        .map((e: string) => `(${new minimatch.Minimatch(e).makeRe().source})`)
-        .join("|")
-    );
-  }
-
-  private searchFiles(re: RegExp, root: any, directory: any): any[] {
-    // skip over ignored directories
-    const directoryWithoutRoot = directory.getPath().substring(root.getPath().length);
-    if (this.ignorePattern().test(directoryWithoutRoot)) {
-      return [];
-    }
-
-    let result = [];
-    for (const e of directory.getEntriesSync()) {
-      if (e.isDirectory()) {
-        result.push(...this.searchFiles(re, root, e));
-      } else if (e.isFile()) {
-        // skip over ignored files
-        const fileWithoutRoot = e.getPath().substring(root.getPath().length);
-        if (this.ignorePattern().test(fileWithoutRoot)) {
-          continue;
-        }
-
-        // check for a substring match, ignoring case, directory separators, and dots
-        const path = fileWithoutRoot.toLowerCase().replace(/\/|\./g, "");
-        if (path.search(re) > -1) {
-          result.push(e);
-        }
-      }
-    }
-
-    return result;
   }
 
   async focus(): Promise<any> {
@@ -217,7 +180,7 @@ export default class CommandHandler extends BaseCommandHandler {
       source: "",
       cursor: 0,
       filename: "",
-      files: this.openFileList.map(e => e.getPath()),
+      files: this.openFileList,
       roots: atom.project.getPaths()
     };
 
@@ -269,31 +232,32 @@ export default class CommandHandler extends BaseCommandHandler {
   }
 
   async COMMAND_TYPE_OPEN_FILE(data: any): Promise<any> {
-    atom.workspace.open(this.openFileList[data.index || 0].getPath());
+    atom.workspace.open(this.openFileList[data.index || 0]);
   }
 
   async COMMAND_TYPE_OPEN_FILE_LIST(data: any): Promise<any> {
     // we want to look for any substring match, so replace spaces with wildcard
-    const re = new RegExp(
-      data.path
-        .toLowerCase()
-        .replace(".", "")
-        .replace(/ /g, "(.*)")
-    );
+    const search = "**" + data.path.toLowerCase().replace(/ /g, "**") + "**";
 
     this.openFileList = [];
     for (const e of atom.project.getDirectories()) {
-      this.openFileList.push(...this.searchFiles(re, e, e));
+      this.openFileList.push(
+        ...globby.sync([search], {
+          cwd: e.getPath(),
+          absolute: true,
+          caseSensitiveMatch: false,
+          baseNameMatch: true,
+          gitignore: true
+        })
+      );
     }
 
-    if (this.openFileList.length > 0) {
-      return {
-        message: "sendText",
-        data: {
-          text: `callback open`
-        }
-      };
-    }
+    return {
+      message: "sendText",
+      data: {
+        text: `callback open`
+      }
+    };
   }
 
   async COMMAND_TYPE_PASTE(data: any): Promise<any> {
