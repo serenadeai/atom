@@ -176,17 +176,21 @@ export default class CommandHandler extends BaseCommandHandler {
   }
 
   async COMMAND_TYPE_GET_EDITOR_STATE(_data: any): Promise<any> {
+    if (!this.activeEditor) {
+      return;
+    }
+
     let result = {
       source: "",
       cursor: 0,
-      filename: "",
+      filename: this.filenameForEditor(this.activeEditor!),
       files: this.openFileList,
-      roots: atom.project.getPaths()
+      roots: atom.project.getPaths(),
+      tabs: atom.workspace
+        .getActivePane()
+        .getItems()
+        .map((e: any) => e.getTitle())
     };
-
-    if (!this.activeEditor) {
-      return result;
-    }
 
     let position = this.activeEditor!.getCursorBufferPosition();
     let row = position.row;
@@ -215,7 +219,7 @@ export default class CommandHandler extends BaseCommandHandler {
 
     result.source = text;
     result.cursor = cursor;
-    result.filename = this.filenameForEditor(this.activeEditor!);
+
     return {
       message: "editorState",
       data: result
