@@ -9,7 +9,10 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-  "keywords": ["voice", "accessibility"],
+  "keywords": [
+    "voice",
+    "accessibility"
+  ],
   "scripts": {
     "compile": "sass ../editor-shared/src/global.scss ../editor-shared/build/global.css && webpack --mode production",
     "dev": "webpack --mode development --watch"
@@ -24,6 +27,7 @@
   },
   "devDependencies": {
     "@types/atom": "^1.36.1",
+    "@types/globby": "^9.1.0",
     "@types/mkdirp": "^0.5.2",
     "@types/node": "^10.14.12",
     "@types/uuid": "^7.0.2",
