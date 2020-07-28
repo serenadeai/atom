@@ -21,23 +21,12 @@ export default class CommandHandler extends BaseCommandHandler {
   }
 
   private filenameForEditor(editor: any): string {
-    let filename = editor.getPath();
-    const known = ["js", "jsx", "vue", "ts", "tsx", "java", "py", "html", "css", "less", "scss"];
-    for (const extension of known) {
-      if (filename.endsWith(`.${extension}`)) {
-        return filename;
-      }
-    }
-
     const scopes = editor.getRootScopeDescriptor().scopes;
     if (scopes.length === 0) {
-      return filename;
+      return editor.getPath();
     }
 
-    if (!filename) {
-      filename = "file";
-    }
-
+    const filename = "file";
     const scopeToFilename: { [key: string]: string } = {
       "source.css": `${filename}.css`,
       "text.html": `${filename}.html`,
@@ -47,7 +36,7 @@ export default class CommandHandler extends BaseCommandHandler {
       "source.python": `${filename}.py`,
       "source.css.scss": `${filename}.css`,
       "source.ts": `${filename}.ts`,
-      "source.tsx": `${filename}.tsx`
+      "source.tsx": `${filename}.tsx`,
     };
 
     for (const k of Object.keys(scopeToFilename)) {
@@ -56,7 +45,7 @@ export default class CommandHandler extends BaseCommandHandler {
       }
     }
 
-    return filename;
+    return editor.getPath();
   }
 
   async focus(): Promise<any> {
@@ -90,7 +79,7 @@ export default class CommandHandler extends BaseCommandHandler {
             class:
               range.diffRangeType == diff.DiffRangeType.Delete
                 ? `error-color-${steps[i]}`
-                : `success-color-${steps[i]}`
+                : `success-color-${steps[i]}`,
           });
           setTimeout(() => {
             marker.destroy();
@@ -126,7 +115,7 @@ export default class CommandHandler extends BaseCommandHandler {
 
     this.activeEditor!.setSelectedBufferRange([
       [startRow, startColumn],
-      [endRow, endColumn]
+      [endRow, endColumn],
     ]);
   }
 
@@ -143,7 +132,7 @@ export default class CommandHandler extends BaseCommandHandler {
   }
 
   async uiDelay() {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         resolve();
       }, 300);
@@ -189,7 +178,7 @@ export default class CommandHandler extends BaseCommandHandler {
       tabs: atom.workspace
         .getActivePane()
         .getItems()
-        .map((e: any) => e.getTitle())
+        .map((e: any) => e.getTitle()),
     };
 
     let position = this.activeEditor!.getCursorBufferPosition();
@@ -222,7 +211,7 @@ export default class CommandHandler extends BaseCommandHandler {
 
     return {
       message: "editorState",
-      data: result
+      data: result,
     };
   }
 
@@ -251,7 +240,7 @@ export default class CommandHandler extends BaseCommandHandler {
           absolute: true,
           caseSensitiveMatch: false,
           baseNameMatch: true,
-          gitignore: true
+          gitignore: true,
         })
       );
     }
@@ -259,8 +248,8 @@ export default class CommandHandler extends BaseCommandHandler {
     return {
       message: "sendText",
       data: {
-        text: `callback open`
-      }
+        text: `callback open`,
+      },
     };
   }
 
