@@ -4,11 +4,12 @@ import App from "./app";
 import BaseCommandHandler from "./shared/command-handler";
 import * as diff from "./shared/diff";
 import Settings from "./shared/settings";
+import { TextEditor } from "atom";
 
 declare var atom: any;
 
 export default class CommandHandler extends BaseCommandHandler {
-  private activeEditor: any = atom.workspace.getActiveTextEditor();
+  private activeEditor: TextEditor | undefined = atom.workspace.getActiveTextEditor();
   private openFileList: any[] = [];
 
   private dispatch(command: string) {
@@ -50,7 +51,7 @@ export default class CommandHandler extends BaseCommandHandler {
 
   async focus(): Promise<any> {
     if (this.activeEditor) {
-      atom.workspace.paneForItem(this.activeEditor!)!.activate();
+      atom.workspace.paneForItem(this.activeEditor)!.activate();
     }
   }
 
@@ -59,7 +60,7 @@ export default class CommandHandler extends BaseCommandHandler {
       return undefined;
     }
 
-    return this.activeEditor!.getText();
+    return this.activeEditor.getText();
   }
 
   highlightRanges(ranges: diff.DiffRange[]): number {
@@ -73,17 +74,19 @@ export default class CommandHandler extends BaseCommandHandler {
     for (let range of ranges) {
       for (let i = 0; i < steps.length; i++) {
         setTimeout(() => {
-          const marker = this.activeEditor!.markBufferRange([range.start, range.stop]);
-          this.activeEditor!.decorateMarker(marker, {
-            type: "highlight",
-            class:
-              range.diffRangeType == diff.DiffRangeType.Delete
-                ? `error-color-${steps[i]}`
-                : `success-color-${steps[i]}`,
-          });
-          setTimeout(() => {
-            marker.destroy();
-          }, step);
+          if (this.activeEditor) {
+            const marker = this.activeEditor.markBufferRange([range.start, range.stop]);
+            this.activeEditor.decorateMarker(marker, {
+              type: "highlight",
+              class:
+                range.diffRangeType == diff.DiffRangeType.Delete
+                  ? `error-color-${steps[i]}`
+                  : `success-color-${steps[i]}`,
+            });
+            setTimeout(() => {
+              marker.destroy();
+            }, step);
+          }
         }, i * step);
       }
     }
@@ -113,7 +116,7 @@ export default class CommandHandler extends BaseCommandHandler {
       return;
     }
 
-    this.activeEditor!.setSelectedBufferRange([
+    this.activeEditor.setSelectedBufferRange([
       [startRow, startColumn],
       [endRow, endColumn],
     ]);
@@ -125,7 +128,7 @@ export default class CommandHandler extends BaseCommandHandler {
     }
 
     // set the text and the cursor in the same transcation, so undo/redo use the correct cursor position
-    this.activeEditor!.transact(() => {
+    this.activeEditor.transact(() => {
       this.activeEditor!.setText(source);
       this.activeEditor!.setCursorBufferPosition([row, column]);
     });
@@ -172,7 +175,7 @@ export default class CommandHandler extends BaseCommandHandler {
     let result = {
       source: "",
       cursor: 0,
-      filename: this.filenameForEditor(this.activeEditor!),
+      filename: this.filenameForEditor(this.activeEditor),
       files: this.openFileList,
       roots: atom.project.getPaths(),
       tabs: atom.workspace
@@ -181,10 +184,10 @@ export default class CommandHandler extends BaseCommandHandler {
         .map((e: any) => e.getTitle()),
     };
 
-    let position = this.activeEditor!.getCursorBufferPosition();
+    let position = this.activeEditor.getCursorBufferPosition();
     let row = position.row;
     let column = position.column;
-    let text = this.activeEditor!.getText();
+    let text = this.activeEditor.getText();
 
     // iterate through text, incrementing rows when newlines are found, and counting columns when row is right
     let cursor = 0;
@@ -259,7 +262,7 @@ export default class CommandHandler extends BaseCommandHandler {
     }
 
     let text = atom.clipboard.read();
-    let source = this.activeEditor!.getText();
+    let source = this.activeEditor.getText();
     this.pasteText(source, data, text);
   }
 
@@ -275,7 +278,7 @@ export default class CommandHandler extends BaseCommandHandler {
       return;
     }
 
-    this.activeEditor!.redo();
+    this.activeEditor.redo();
   }
 
   async COMMAND_TYPE_SAVE(_data: any): Promise<any> {
@@ -283,13 +286,14 @@ export default class CommandHandler extends BaseCommandHandler {
       return;
     }
 
-    if (this.activeEditor!.getPath()) {
-      this.activeEditor!.save();
+    if (this.activeEditor.getPath()) {
+      return this.activeEditor.save();
     } else {
-      let path = atom.applicationDelegate.showSaveDialog();
-      if (path) {
-        this.activeEditor!.saveAs(path);
-      }
+      return atom.applicationDelegate.showSaveDialog().then((data: any) => {
+        if (!data.canceled) {
+          this.activeEditor!.saveAs(data.filePath);
+        }
+      });
     }
   }
 
@@ -317,7 +321,7 @@ export default class CommandHandler extends BaseCommandHandler {
       return;
     }
 
-    this.activeEditor!.undo();
+    this.activeEditor.undo();
   }
 
   async COMMAND_TYPE_WINDOW(data: any): Promise<any> {
