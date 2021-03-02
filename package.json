@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": "https://github.com/serenadeai/atom",
   "main": "./build/extension",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
