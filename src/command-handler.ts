@@ -11,6 +11,24 @@ declare var atom: any;
 export default class CommandHandler extends BaseCommandHandler {
   private activeEditor: TextEditor | undefined = atom.workspace.getActiveTextEditor();
   private openFileList: any[] = [];
+  private scopeToExtension: { [key: string]: string[] } = {
+    "source.c": ["c", "h"],
+    "source.cpp": ["cpp", "cc", "cxx", "c++", "hpp", "hh", "hxx", "h++", "c", "h"],
+    "source.c++": ["cpp", "cc", "cxx", "c++", "hpp", "hh", "hxx", "h++", "c", "h"],
+    "source.css": ["css", "scss"],
+    "source.scss": ["css", "scss"],
+    "source.go": ["go"],
+    "text.html": ["html", "vue", "svelte"],
+    "text.html.basic": ["html", "vue", "svelte"],
+    "source.java": ["java"],
+    "source.js": ["js", "jsx"],
+    "source.python": ["py"],
+    "source.ruby": ["rb"],
+    "source.rust": ["rs"],
+    "source.shell": ["sh", "bash"],
+    "source.ts": ["ts", "tsx"],
+    "source.tsx": ["tsx", "ts"],
+  };
 
   private dispatch(command: string) {
     let view = atom.workspace.getActivePane();
@@ -19,34 +37,6 @@ export default class CommandHandler extends BaseCommandHandler {
     }
 
     atom.commands.dispatch(view, command);
-  }
-
-  private filenameForEditor(editor: any): string {
-    const scopes = editor.getRootScopeDescriptor().scopes;
-    if (scopes.length === 0) {
-      return editor.getPath();
-    }
-
-    const filename = "file";
-    const scopeToFilename: { [key: string]: string } = {
-      "source.css": `${filename}.css`,
-      "text.html": `${filename}.html`,
-      "source.java": `${filename}.java`,
-      "source.js": `${filename}.js`,
-      "source.css.less": `${filename}.css`,
-      "source.python": `${filename}.py`,
-      "source.css.scss": `${filename}.css`,
-      "source.ts": `${filename}.ts`,
-      "source.tsx": `${filename}.tsx`,
-    };
-
-    for (const k of Object.keys(scopeToFilename)) {
-      if (scopes[0].includes(k)) {
-        return scopeToFilename[k];
-      }
-    }
-
-    return editor.getPath();
   }
 
   async focus(): Promise<any> {
@@ -167,22 +157,35 @@ export default class CommandHandler extends BaseCommandHandler {
     this.reloadActiveEditor();
   }
 
-  async COMMAND_TYPE_GET_EDITOR_STATE(_data: any): Promise<any> {
+  async COMMAND_TYPE_GET_EDITOR_STATE(data: any): Promise<any> {
+    let result = {
+      message: "editorState",
+      data: {
+        source: "",
+        cursor: 0,
+        filename: "",
+        files: this.openFileList,
+        roots: atom.project.getPaths(),
+        tabs: atom.workspace
+          .getActivePane()
+          .getItems()
+          .map((e: any) => e.getTitle()),
+      },
+    };
+
     if (!this.activeEditor) {
-      return;
+      return result;
     }
 
-    let result = {
-      source: "",
-      cursor: 0,
-      filename: this.filenameForEditor(this.activeEditor),
-      files: this.openFileList,
-      roots: atom.project.getPaths(),
-      tabs: atom.workspace
-        .getActivePane()
-        .getItems()
-        .map((e: any) => e.getTitle()),
-    };
+    result.data.filename = this.filenameFromLanguage(
+      this.activeEditor.getPath() || "",
+      this.activeEditor.getGrammar().scopeName,
+      this.scopeToExtension
+    );
+
+    if (data.limited) {
+      return result;
+    }
 
     let position = this.activeEditor.getCursorBufferPosition();
     let row = position.row;
@@ -209,13 +212,9 @@ export default class CommandHandler extends BaseCommandHandler {
       cursor++;
     }
 
-    result.source = text;
-    result.cursor = cursor;
-
-    return {
-      message: "editorState",
-      data: result,
-    };
+    result.data.source = text;
+    result.data.cursor = cursor;
+    return result;
   }
 
   async COMMAND_TYPE_GO_TO_DEFINITION(_data: any): Promise<any> {}
@@ -248,22 +247,7 @@ export default class CommandHandler extends BaseCommandHandler {
       );
     }
 
-    return {
-      message: "sendText",
-      data: {
-        text: `callback open`,
-      },
-    };
-  }
-
-  async COMMAND_TYPE_PASTE(data: any): Promise<any> {
-    if (!this.activeEditor) {
-      return;
-    }
-
-    let text = atom.clipboard.read();
-    let source = this.activeEditor.getText();
-    this.pasteText(source, data, text);
+    return { message: "sendText", data: { text: `callback open` } };
   }
 
   async COMMAND_TYPE_PREVIOUS_TAB(_data: any): Promise<any> {
