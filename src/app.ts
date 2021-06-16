@@ -17,7 +17,7 @@ export default class App extends BaseApp {
     this.subscriptions = new Atom.CompositeDisposable();
     this.subscriptions.add(
       atom.commands.add("atom-workspace", {
-        "serenade:initialize": () => this.initialize()
+        "serenade:initialize": () => this.initialize(),
       })
     );
   }
@@ -77,25 +77,25 @@ export default class App extends BaseApp {
     (this.commandHandler! as CommandHandler).pollActiveEditor();
     this.settings!.setPluginInstalled("atom");
 
-    atom.workspace.observeTextEditors(editor => {
+    atom.workspace.observeTextEditors((editor) => {
       editor.onDidChangeCursorPosition(() => {
         this.updateActive();
       });
     });
 
-    atom.workspace.observeActiveTextEditor(editor => {
+    atom.workspace.observeActiveTextEditor((editor) => {
       if (editor) {
         this.updateActive();
       }
     });
 
-    atom.workspace.observeActivePane(pane => {
+    atom.workspace.observeActivePane((pane) => {
       if (pane) {
         this.updateActive();
       }
     });
 
-    atom.workspace.observeActivePaneItem(item => {
+    atom.workspace.observeActivePaneItem((item) => {
       if (item) {
         this.updateActive();
       }
