@@ -157,12 +157,16 @@ export default class CommandHandler extends BaseCommandHandler {
     this.reloadActiveEditor();
   }
 
+  async COMMAND_TYPE_DUPLICATE_TAB(_data: any): Promise<any> {}
+
   async COMMAND_TYPE_GET_EDITOR_STATE(data: any): Promise<any> {
     let result = {
       message: "editorState",
       data: {
         source: "",
         cursor: 0,
+        selectionStart: 0,
+        selectionEnd: 0,
         filename: "",
         files: this.openFileList,
         roots: atom.project.getPaths(),
@@ -187,10 +191,24 @@ export default class CommandHandler extends BaseCommandHandler {
       return result;
     }
 
-    let position = this.activeEditor.getCursorBufferPosition();
+    let cursorPosition = this.activeEditor.getCursorBufferPosition();
+    let selectionStartPosition = this.activeEditor.getSelectedBufferRange().start;
+    let selectionEndPosition = this.activeEditor.getSelectedBufferRange().end;
+    let text = this.activeEditor.getText();
+    result.data.source = text;
+    result.data.cursor = this.getCursorPosition(cursorPosition, text);
+    result.data.selectionStart = this.getCursorPosition(selectionStartPosition, text);
+    result.data.selectionEnd = this.getCursorPosition(selectionEndPosition, text);
+    if (result.data.selectionStart == result.data.selectionEnd) {
+      result.data.selectionStart = 0;
+      result.data.selectionEnd = 0;
+    }
+    return result;
+  }
+
+  getCursorPosition(position: any, text: string) {
     let row = position.row;
     let column = position.column;
-    let text = this.activeEditor.getText();
 
     // iterate through text, incrementing rows when newlines are found, and counting columns when row is right
     let cursor = 0;
@@ -211,10 +229,7 @@ export default class CommandHandler extends BaseCommandHandler {
 
       cursor++;
     }
-
-    result.data.source = text;
-    result.data.cursor = cursor;
-    return result;
+    return cursor;
   }
 
   async COMMAND_TYPE_GO_TO_DEFINITION(_data: any): Promise<any> {}
