@@ -304,7 +304,7 @@ export default class CommandHandler extends BaseCommandHandler {
   }
 
   async COMMAND_TYPE_SWITCH_TAB(data: any): Promise<any> {
-    let index = data.index - 1;
+    let index = data.index;
     if (index < 0) {
       index = atom.workspace.getActivePane().getItems().length - 1;
     }
