@@ -188,7 +188,7 @@ export default class CommandHandler {
       return result;
     }
 
-    let filename = this.activeEditor.getPath();
+    let filename = this.activeEditor.getPath() || "";
     const scope = this.activeEditor.getGrammar().scopeName;
     if (scope && this.scopeToExtension[scope]) {
       if (!this.scopeToExtension[scope].some((e: string) => filename.endsWith(`.${e}`))) {
@@ -262,7 +262,7 @@ export default class CommandHandler {
       );
     }
 
-    return { message: "open" };
+    return { message: "sendText", data: { text: "callback open" } };
   }
 
   async COMMAND_TYPE_PREVIOUS_TAB(_data: any): Promise<any> {
