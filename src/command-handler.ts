@@ -77,6 +77,30 @@ export default class CommandHandler {
     return 250;
   }
 
+  private rowAndColumnToCursor(row: number, column: number, text: string) {
+    // iterate through text, incrementing rows when newlines are found, and counting columns when row is right
+    let cursor = 0;
+    let currentRow = 0;
+    let currentColumn = 0;
+    for (let i = 0; i < text.length; i++) {
+      if (currentRow == row) {
+        if (currentColumn == column) {
+          break;
+        }
+
+        currentColumn++;
+      }
+
+      if (text[i] == "\n") {
+        currentRow++;
+      }
+
+      cursor++;
+    }
+
+    return cursor;
+  }
+
   private setSourceAndCursor(source: string, row: number, column: number) {
     if (!this.activeEditor) {
       return;
@@ -174,6 +198,8 @@ export default class CommandHandler {
       data: {
         source: "",
         cursor: 0,
+        selectionStart: 0,
+        selectionEnd: 0,
         filename: "",
         files: this.openFileList,
         roots: atom.project.getPaths(),
@@ -201,33 +227,28 @@ export default class CommandHandler {
       return result;
     }
 
-    let position = this.activeEditor.getCursorBufferPosition();
-    let row = position.row;
-    let column = position.column;
-    let text = this.activeEditor.getText();
+    const source = this.activeEditor.getText();
+    const cursor = this.activeEditor.getCursorBufferPosition();
+    const selectionStart = this.activeEditor.getSelectedBufferRange().start;
+    const selectionEnd = this.activeEditor.getSelectedBufferRange().end;
+    result.data.selectionStart = this.rowAndColumnToCursor(
+      selectionStart.row,
+      selectionStart.column,
+      source
+    );
+    result.data.selectionEnd = this.rowAndColumnToCursor(
+      selectionEnd.row,
+      selectionEnd.column,
+      source
+    );
 
-    // iterate through text, incrementing rows when newlines are found, and counting columns when row is right
-    let cursor = 0;
-    let currentRow = 0;
-    let currentColumn = 0;
-    for (let i = 0; i < text.length; i++) {
-      if (currentRow == row) {
-        if (currentColumn == column) {
-          break;
-        }
-
-        currentColumn++;
-      }
-
-      if (text[i] == "\n") {
-        currentRow++;
-      }
-
-      cursor++;
+    if (result.data.selectionStart == result.data.selectionEnd) {
+      result.data.selectionStart = 0;
+      result.data.selectionEnd = 0;
     }
 
-    result.data.source = text;
-    result.data.cursor = cursor;
+    result.data.source = source;
+    result.data.cursor = this.rowAndColumnToCursor(cursor.row, cursor.column, source);
     result.data.available = true;
     result.data.canGetState = true;
     result.data.canSetState = true;

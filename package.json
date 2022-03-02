@@ -9,10 +9,7 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-  "keywords": [
-    "voice",
-    "accessibility"
-  ],
+  "keywords": ["voice", "accessibility"],
   "scripts": {
     "build": "webpack --mode production",
     "dev": "webpack --mode development --watch"
