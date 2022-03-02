@@ -74,7 +74,7 @@ export default class App {
     this.subscriptions!.dispose();
   }
 
-  async initialize() {
+  initialize() {
     if (this.initialized) {
       return;
     }
