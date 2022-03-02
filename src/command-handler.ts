@@ -89,7 +89,7 @@ export default class CommandHandler {
     });
   }
 
-  private async uiDelay(timeout: number = 300) {
+  private async uiDelay(timeout: number = 300): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve();
