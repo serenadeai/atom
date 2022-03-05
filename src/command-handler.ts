@@ -202,7 +202,6 @@ export default class CommandHandler {
         selectionEnd: 0,
         filename: "",
         files: this.openFileList,
-        roots: atom.project.getPaths(),
         tabs: atom.workspace
           .getActivePane()
           .getItems()
@@ -226,6 +225,22 @@ export default class CommandHandler {
     if (data.limited) {
       return result;
     }
+
+    // filter out the longest root that's a prefix of the filename
+    const roots = atom.project.getPaths();
+    let files = [];
+    for (const file of this.openFileList) {
+      let prefixLength = 0;
+      for (const root of roots) {
+        if (file.startsWith(root) && prefixLength < file.length) {
+          prefixLength = root.length + 1;
+        }
+      }
+
+      files.push(file.substring(prefixLength));
+    }
+
+    result.data.files = files;
 
     const source = this.activeEditor.getText();
     const cursor = this.activeEditor.getCursorBufferPosition();
@@ -283,7 +298,7 @@ export default class CommandHandler {
       );
     }
 
-    return { message: "sendText", data: { text: "callback open" } };
+    return { message: "open" };
   }
 
   async COMMAND_TYPE_PREVIOUS_TAB(_data: any): Promise<any> {
