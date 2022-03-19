@@ -1,14 +1,13 @@
 import * as fs from "fs";
 import * as globby from "globby";
 import App from "./app";
-import BaseCommandHandler from "./shared/command-handler";
-import * as diff from "./shared/diff";
-import Settings from "./shared/settings";
+import Settings from "./settings";
+import * as diff from "./diff";
 import { TextEditor } from "atom";
 
 declare var atom: any;
 
-export default class CommandHandler extends BaseCommandHandler {
+export default class CommandHandler {
   private activeEditor: TextEditor | undefined = atom.workspace.getActiveTextEditor();
   private openFileList: any[] = [];
   private scopeToExtension: { [key: string]: string[] } = {
@@ -30,6 +29,8 @@ export default class CommandHandler extends BaseCommandHandler {
     "source.tsx": ["tsx", "ts"],
   };
 
+  constructor(private settings: Settings) {}
+
   private dispatch(command: string) {
     let view = atom.workspace.getActivePane();
     if (this.activeEditor) {
@@ -39,21 +40,13 @@ export default class CommandHandler extends BaseCommandHandler {
     atom.commands.dispatch(view, command);
   }
 
-  async focus(): Promise<any> {
+  private focus() {
     if (this.activeEditor) {
       atom.workspace.paneForItem(this.activeEditor)!.activate();
     }
   }
 
-  getActiveEditorText(): string | undefined {
-    if (!this.activeEditor) {
-      return undefined;
-    }
-
-    return this.activeEditor.getText();
-  }
-
-  highlightRanges(ranges: diff.DiffRange[]): number {
+  private highlightRanges(ranges: diff.DiffRange[]): number {
     const duration = 200;
     const steps = [1, 2, 1];
     const step = duration / steps.length;
@@ -61,7 +54,7 @@ export default class CommandHandler extends BaseCommandHandler {
       return 0;
     }
 
-    for (let range of ranges) {
+    for (const range of ranges) {
       for (let i = 0; i < steps.length; i++) {
         setTimeout(() => {
           if (this.activeEditor) {
@@ -84,35 +77,31 @@ export default class CommandHandler extends BaseCommandHandler {
     return 250;
   }
 
-  pollActiveEditor() {
-    setInterval(() => {
-      this.reloadActiveEditor();
-    }, 1000);
-  }
+  private rowAndColumnToCursor(row: number, column: number, text: string) {
+    // iterate through text, incrementing rows when newlines are found, and counting columns when row is right
+    let cursor = 0;
+    let currentRow = 0;
+    let currentColumn = 0;
+    for (let i = 0; i < text.length; i++) {
+      if (currentRow == row) {
+        if (currentColumn == column) {
+          break;
+        }
 
-  reloadActiveEditor() {
-    const editor = atom.workspace.getActiveTextEditor();
-    if (!editor) {
-      return;
+        currentColumn++;
+      }
+
+      if (text[i] == "\n") {
+        currentRow++;
+      }
+
+      cursor++;
     }
 
-    this.activeEditor = editor;
+    return cursor;
   }
 
-  async scrollToCursor(): Promise<any> {}
-
-  select(startRow: number, startColumn: number, endRow: number, endColumn: number) {
-    if (!this.activeEditor) {
-      return;
-    }
-
-    this.activeEditor.setSelectedBufferRange([
-      [startRow, startColumn],
-      [endRow, endColumn],
-    ]);
-  }
-
-  setSourceAndCursor(_before: string, source: string, row: number, column: number) {
+  private setSourceAndCursor(source: string, row: number, column: number) {
     if (!this.activeEditor) {
       return;
     }
@@ -124,11 +113,11 @@ export default class CommandHandler extends BaseCommandHandler {
     });
   }
 
-  async uiDelay() {
+  private uiDelay(timeout: number = 300): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve();
-      }, 300);
+      }, timeout);
     });
   }
 
@@ -157,10 +146,54 @@ export default class CommandHandler extends BaseCommandHandler {
     this.reloadActiveEditor();
   }
 
-  async COMMAND_TYPE_DUPLICATE_TAB(_data: any): Promise<any> {}
+  async COMMAND_TYPE_DIFF(data: any): Promise<any> {
+    await this.focus();
+    if (!this.activeEditor) {
+      return;
+    }
+
+    const before = this.activeEditor.getText() || "";
+    const [row, column] = diff.cursorToRowAndColumn(data.source, data.cursor);
+    if (!this.settings.getAnimations()) {
+      this.setSourceAndCursor(data.source, row, column);
+      return;
+    }
+
+    let ranges = diff.diff(before, data.source);
+    if (ranges.length == 0) {
+      ranges = [
+        new diff.DiffRange(
+          diff.DiffRangeType.Add,
+          diff.DiffHighlightType.Line,
+          new diff.DiffPoint(row, 0),
+          new diff.DiffPoint(row + 1, 0)
+        ),
+      ];
+    }
+
+    const addRanges = ranges.filter(
+      (e: diff.DiffRange) => e.diffRangeType == diff.DiffRangeType.Add
+    );
+
+    const deleteRanges = ranges.filter(
+      (e: diff.DiffRange) => e.diffRangeType == diff.DiffRangeType.Delete
+    );
+
+    const timeout = this.highlightRanges(deleteRanges);
+    return new Promise((resolve) => {
+      setTimeout(
+        async () => {
+          this.setSourceAndCursor(data.source, row, column);
+          this.highlightRanges(addRanges);
+          resolve(null);
+        },
+        deleteRanges.length > 0 ? timeout : 1
+      );
+    });
+  }
 
   async COMMAND_TYPE_GET_EDITOR_STATE(data: any): Promise<any> {
-    let result = {
+    let result: any = {
       message: "editorState",
       data: {
         source: "",
@@ -169,7 +202,6 @@ export default class CommandHandler extends BaseCommandHandler {
         selectionEnd: 0,
         filename: "",
         files: this.openFileList,
-        roots: atom.project.getPaths(),
         tabs: atom.workspace
           .getActivePane()
           .getItems()
@@ -181,58 +213,62 @@ export default class CommandHandler extends BaseCommandHandler {
       return result;
     }
 
-    result.data.filename = this.filenameFromLanguage(
-      this.activeEditor.getPath() || "",
-      this.activeEditor.getGrammar().scopeName,
-      this.scopeToExtension
-    );
+    let filename = this.activeEditor.getPath() || "";
+    const scope = this.activeEditor.getGrammar().scopeName;
+    if (scope && this.scopeToExtension[scope]) {
+      if (!this.scopeToExtension[scope].some((e: string) => filename.endsWith(`.${e}`))) {
+        filename = (filename || "file") + `.${this.scopeToExtension[scope][0]}`;
+      }
+    }
 
+    result.data.filename = filename;
     if (data.limited) {
       return result;
     }
 
-    let cursorPosition = this.activeEditor.getCursorBufferPosition();
-    let selectionStartPosition = this.activeEditor.getSelectedBufferRange().start;
-    let selectionEndPosition = this.activeEditor.getSelectedBufferRange().end;
-    let text = this.activeEditor.getText();
-    result.data.source = text;
-    result.data.cursor = this.getCursorPosition(cursorPosition, text);
-    result.data.selectionStart = this.getCursorPosition(selectionStartPosition, text);
-    result.data.selectionEnd = this.getCursorPosition(selectionEndPosition, text);
+    // filter out the longest root that's a prefix of the filename
+    const roots = atom.project.getPaths();
+    let files = [];
+    for (const file of this.openFileList) {
+      let prefixLength = 0;
+      for (const root of roots) {
+        if (file.startsWith(root) && prefixLength < file.length) {
+          prefixLength = root.length + 1;
+        }
+      }
+
+      files.push(file.substring(prefixLength));
+    }
+
+    result.data.files = files;
+
+    const source = this.activeEditor.getText();
+    const cursor = this.activeEditor.getCursorBufferPosition();
+    const selectionStart = this.activeEditor.getSelectedBufferRange().start;
+    const selectionEnd = this.activeEditor.getSelectedBufferRange().end;
+    result.data.selectionStart = this.rowAndColumnToCursor(
+      selectionStart.row,
+      selectionStart.column,
+      source
+    );
+    result.data.selectionEnd = this.rowAndColumnToCursor(
+      selectionEnd.row,
+      selectionEnd.column,
+      source
+    );
+
     if (result.data.selectionStart == result.data.selectionEnd) {
       result.data.selectionStart = 0;
       result.data.selectionEnd = 0;
     }
+
+    result.data.source = source;
+    result.data.cursor = this.rowAndColumnToCursor(cursor.row, cursor.column, source);
+    result.data.available = true;
+    result.data.canGetState = true;
+    result.data.canSetState = true;
     return result;
   }
-
-  getCursorPosition(position: any, text: string) {
-    let row = position.row;
-    let column = position.column;
-
-    // iterate through text, incrementing rows when newlines are found, and counting columns when row is right
-    let cursor = 0;
-    let currentRow = 0;
-    let currentColumn = 0;
-    for (let i = 0; i < text.length; i++) {
-      if (currentRow == row) {
-        if (currentColumn == column) {
-          break;
-        }
-
-        currentColumn++;
-      }
-
-      if (text[i] == "\n") {
-        currentRow++;
-      }
-
-      cursor++;
-    }
-    return cursor;
-  }
-
-  async COMMAND_TYPE_GO_TO_DEFINITION(_data: any): Promise<any> {}
 
   async COMMAND_TYPE_NEXT_TAB(_data: any): Promise<any> {
     await this.focus();
@@ -262,7 +298,7 @@ export default class CommandHandler extends BaseCommandHandler {
       );
     }
 
-    return { message: "sendText", data: { text: `callback open` } };
+    return { message: "open" };
   }
 
   async COMMAND_TYPE_PREVIOUS_TAB(_data: any): Promise<any> {
@@ -294,6 +330,19 @@ export default class CommandHandler extends BaseCommandHandler {
         }
       });
     }
+  }
+
+  async COMMAND_TYPE_SELECT(data: any): Promise<any> {
+    if (!this.activeEditor) {
+      return;
+    }
+
+    const [startRow, startColumn] = diff.cursorToRowAndColumn(data.source, data.cursor);
+    const [endRow, endColumn] = diff.cursorToRowAndColumn(data.source, data.cursorEnd);
+    this.activeEditor.setSelectedBufferRange([
+      [startRow, startColumn],
+      [endRow, endColumn],
+    ]);
   }
 
   async COMMAND_TYPE_SPLIT(data: any): Promise<any> {
@@ -330,5 +379,20 @@ export default class CommandHandler extends BaseCommandHandler {
     this.dispatch("window:focus-pane-" + commands[data.direction]);
     await this.uiDelay();
     this.reloadActiveEditor();
+  }
+
+  pollActiveEditor() {
+    setInterval(() => {
+      this.reloadActiveEditor();
+    }, 1000);
+  }
+
+  reloadActiveEditor() {
+    const editor = atom.workspace.getActiveTextEditor();
+    if (!editor) {
+      return;
+    }
+
+    this.activeEditor = editor;
   }
 }

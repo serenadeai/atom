@@ -1,41 +1,27 @@
 import * as Atom from "atom";
-import BaseApp from "./shared/app";
 import CommandHandler from "./command-handler";
+import IPC from "./ipc";
+import Settings from "./settings";
 
-export default class App extends BaseApp {
+export default class App {
+  private commandHandler?: CommandHandler;
+  private ipc?: IPC;
+  private initialized: boolean = false;
+  private settings?: Settings;
   private subscriptions?: Atom.CompositeDisposable;
   private panel?: Atom.Panel;
 
-  private updateActive() {
-    this.ipc!.sendActive();
-    (this.commandHandler! as CommandHandler).reloadActiveEditor();
+  private checkInstalled(): boolean {
+    const installed = this.settings!.getInstalled();
+    if (!installed) {
+      this.showInstallMessage();
+      return false;
+    }
+
+    return true;
   }
 
-  activate() {
-    this.initialize();
-
-    this.subscriptions = new Atom.CompositeDisposable();
-    this.subscriptions.add(
-      atom.commands.add("atom-workspace", {
-        "serenade:initialize": () => this.initialize(),
-      })
-    );
-  }
-
-  app() {
-    return "atom";
-  }
-
-  createCommandHandler(): CommandHandler {
-    return new CommandHandler(this.settings!);
-  }
-
-  deactivate() {
-    this.destroy();
-    this.subscriptions!.dispose();
-  }
-
-  hideMessage() {
+  private hideMessage() {
     if (!this.panel) {
       return;
     }
@@ -43,7 +29,7 @@ export default class App extends BaseApp {
     this.panel!.destroy();
   }
 
-  showInstallMessage() {
+  private showInstallMessage() {
     const message = document.createElement("div");
     message.innerHTML = `
 <div class="serenade-message">
@@ -68,14 +54,40 @@ export default class App extends BaseApp {
     this.panel = atom.workspace.addRightPanel({ item: message });
   }
 
-  async initialize() {
+  private updateActive() {
+    this.ipc!.sendActive();
+    this.commandHandler!.reloadActiveEditor();
+  }
+
+  activate() {
+    this.initialize();
+
+    this.subscriptions = new Atom.CompositeDisposable();
+    this.subscriptions.add(
+      atom.commands.add("atom-workspace", {
+        "serenade:initialize": () => this.initialize(),
+      })
+    );
+  }
+
+  deactivate() {
+    this.subscriptions!.dispose();
+  }
+
+  initialize() {
     if (this.initialized) {
       return;
     }
 
-    this.run();
-    (this.commandHandler! as CommandHandler).pollActiveEditor();
-    this.settings!.setPluginInstalled("atom");
+    this.initialized = true;
+    this.settings = new Settings();
+    this.commandHandler = new CommandHandler(this.settings);
+    this.ipc = new IPC(this.commandHandler, "atom");
+
+    this.ipc.start();
+    this.checkInstalled();
+    this.commandHandler.pollActiveEditor();
+    this.settings.setPluginInstalled("atom");
 
     atom.workspace.observeTextEditors((editor) => {
       editor.onDidChangeCursorPosition(() => {
