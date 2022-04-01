@@ -200,6 +200,8 @@ export default class CommandHandler {
         cursor: 0,
         selectionStart: 0,
         selectionEnd: 0,
+        canGetState: false,
+        canSetState: false,
         filename: "",
         files: this.openFileList,
         tabs: atom.workspace
@@ -222,6 +224,9 @@ export default class CommandHandler {
     }
 
     result.data.filename = filename;
+    result.data.canGetState = true;
+    result.data.canSetState = true;
+
     if (data.limited) {
       return result;
     }
